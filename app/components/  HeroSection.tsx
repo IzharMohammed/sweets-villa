@@ -4,28 +4,10 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { Anton, Libre_Caslon_Display, Montserrat } from "next/font/google";
 import { SplitText } from "gsap/all";
-import Lenis from "@studio-freight/lenis/types";
+import { lato, libre, montserrat } from "@/lib/fonts";
 
 gsap.registerPlugin(ScrollTrigger);
-const libre = Libre_Caslon_Display({
-  weight: "400",
-  style: "normal",
-  subsets: ["latin"],
-});
-
-const montserrat = Montserrat({
-  weight: "400",
-  style: "normal",
-  subsets: ["latin"],
-});
-
-const anton = Anton({
-  weight: "400",
-  style: "normal",
-  subsets: ["latin"],
-});
 
 export default function HeroSection() {
   const navTitleRef = useRef<HTMLDivElement>(null);
@@ -198,7 +180,7 @@ export default function HeroSection() {
             className="relative z-10 text-center -translate-y-18"
           >
             <h1
-              className={`no-select title text-white ${anton.className} text-8xl font-light tracking-wider whitespace-nowrap`}
+              className={`no-select title text-white ${lato.className} text-8xl font-light tracking-wider whitespace-nowrap`}
             >
               SRI MAHALAKSHMI <span className="mx-4">—</span> SWEETS
             </h1>
