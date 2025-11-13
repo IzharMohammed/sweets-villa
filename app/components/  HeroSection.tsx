@@ -115,6 +115,7 @@ export default function HeroSection() {
       stagger: 0.06,
       delay: 1,
     });
+
     return () => {
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
@@ -128,25 +129,25 @@ export default function HeroSection() {
           <div className="flex items-center space-x-8">
             <a
               href="#"
-              className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full"
+              className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full"
             >
               SHOP
             </a>
             <a
               href="#"
-              className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full"
+              className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full"
             >
               COLLECTIONS
             </a>
             <a
               href="#"
-              className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full"
+              className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full"
             >
               ABOUT US
             </a>
             <a
               href="#"
-              className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full"
+              className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full"
             >
               SIGNATURE TREATS
             </a>
@@ -163,13 +164,13 @@ export default function HeroSection() {
           </div>
 
           <div className="flex items-center space-x-6">
-            <button className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full">
+            <button className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full">
               SEARCH
             </button>
-            <button className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full">
+            <button className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full">
               ACCOUNT
             </button>
-            <button className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full">
+            <button className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full">
               CART (0)
             </button>
           </div>
@@ -197,7 +198,7 @@ export default function HeroSection() {
             className="relative z-10 text-center -translate-y-18"
           >
             <h1
-              className={`title text-white ${anton.className} text-8xl font-light tracking-wider whitespace-nowrap`}
+              className={`no-select title text-white ${anton.className} text-8xl font-light tracking-wider whitespace-nowrap`}
             >
               SRI MAHALAKSHMI <span className="mx-4">—</span> SWEETS
             </h1>
@@ -206,7 +207,7 @@ export default function HeroSection() {
           {/* Description */}
           <div
             ref={descriptionRef}
-            className="absolute bottom-20 left-12 max-w-md z-10 subtitle"
+            className="no-select absolute bottom-20 left-12 max-w-md z-10 subtitle"
           >
             <h2
               className={`text-white text-5xl ${libre.className} font-serif mb-4`}
