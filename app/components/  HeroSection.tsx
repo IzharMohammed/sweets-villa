@@ -3,9 +3,9 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { Anton, Libre_Caslon_Display, Montserrat } from "next/font/google";
+import { SplitText } from "gsap/all";
 
 gsap.registerPlugin(ScrollTrigger);
 const libre = Libre_Caslon_Display({
@@ -34,7 +34,6 @@ export default function HeroSection() {
 
   useGSAP(() => {
     // Main animation timeline
-
     const t1 = gsap.timeline({
       scrollTrigger: {
         trigger: heroRef.current,
@@ -46,7 +45,6 @@ export default function HeroSection() {
     });
 
     // Animate title scaling and position
-
     t1.to(titleRef.current, {
       scale: 0.35,
       y: -window.innerHeight / 2 + 40, // Move to navbar position
@@ -65,6 +63,54 @@ export default function HeroSection() {
       },
       0
     ); // Start at the same time as title animation
+
+    // Show navbar title
+    ScrollTrigger.create({
+      trigger: heroRef.current,
+      start: "bottom top",
+      onEnter: () => {
+        gsap.to(navTitleRef.current, {
+          opacity: 1,
+          duration: 0.3,
+        });
+      },
+      onLeaveBack: () => {
+        gsap.to(navTitleRef.current, {
+          opacity: 0,
+          duration: 0.3,
+        });
+      },
+    });
+
+    const heroSplit = new SplitText(".title", {
+      type: "chars, words",
+    });
+
+    const paragraphSplit = new SplitText(".subtitle", {
+      type: "lines",
+    });
+
+    heroSplit.chars.forEach((char) => char.classList.add("text-gradient"));
+
+    gsap.from(heroSplit.chars, {
+      yPercent: 100,
+      duration: 1.8,
+      ease: "expo.out",
+      stagger: 0.06,
+    });
+
+    gsap.from(paragraphSplit.lines, {
+      opacity: 0,
+      yPercent: 100,
+      duration: 1.8,
+      ease: "expo.out",
+      stagger: 0.06,
+      delay: 1,
+    });
+
+    return () => {
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    };
   }, []);
 
   return (
@@ -92,7 +138,7 @@ export default function HeroSection() {
             ref={navTitleRef}
             className="absolute left-1/2 -translate-x-1/2 opacity-0"
           >
-            <h2 className="text-white text-xl font-light tracking-wider">
+            <h2 className="title text-white text-xl font-light tracking-wider">
               SRI MAHALAKSHMI <span className="mx-2">—</span> SWEETS
             </h2>
           </div>
@@ -128,7 +174,9 @@ export default function HeroSection() {
 
           {/* Main Title */}
           <div ref={titleRef} className="relative z-10 text-center">
-            <h1 className={`text-white ${anton.className} text-8xl font-light tracking-wider whitespace-nowrap`}>
+            <h1
+              className={`text-white ${anton.className} text-8xl font-light tracking-wider whitespace-nowrap`}
+            >
               SRI MAHALAKSHMI <span className="mx-4">—</span> SWEETS
             </h1>
           </div>
@@ -136,7 +184,7 @@ export default function HeroSection() {
           {/* Description */}
           <div
             ref={descriptionRef}
-            className="absolute bottom-20 left-12 max-w-md z-10"
+            className="absolute bottom-20 left-12 max-w-md z-10 subtitle"
           >
             <h2
               className={`text-white text-5xl ${libre.className} font-serif mb-4`}
