@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { Anton, Libre_Caslon_Display, Montserrat } from "next/font/google";
 import { SplitText } from "gsap/all";
+import Lenis from "@studio-freight/lenis/types";
 
 gsap.registerPlugin(ScrollTrigger);
 const libre = Libre_Caslon_Display({
@@ -64,6 +65,13 @@ export default function HeroSection() {
       0
     ); // Start at the same time as title animation
 
+    gsap.from(titleRef.current, {
+      y: 50,
+      opacity: 0,
+      duration: 1.5,
+      ease: "expo.out",
+    });
+
     // Show navbar title
     ScrollTrigger.create({
       trigger: heroRef.current,
@@ -107,7 +115,6 @@ export default function HeroSection() {
       stagger: 0.06,
       delay: 1,
     });
-
     return () => {
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
@@ -119,16 +126,28 @@ export default function HeroSection() {
       <nav className="fixed top-0 left-0 w-full z-50 bg-slate-800/80 backdrop-blur-md">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-8">
-            <a href="#" className="text-white hover:text-white text-sm">
+            <a
+              href="#"
+              className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full"
+            >
               SHOP
             </a>
-            <a href="#" className="text-white hover:text-white text-sm">
+            <a
+              href="#"
+              className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full"
+            >
               COLLECTIONS
             </a>
-            <a href="#" className="text-white hover:text-white text-sm">
+            <a
+              href="#"
+              className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full"
+            >
               ABOUT US
             </a>
-            <a href="#" className="text-white hover:text-white text-sm">
+            <a
+              href="#"
+              className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full"
+            >
               SIGNATURE TREATS
             </a>
           </div>
@@ -138,19 +157,19 @@ export default function HeroSection() {
             ref={navTitleRef}
             className="absolute left-1/2 -translate-x-1/2 opacity-0"
           >
-            <h2 className="title text-white text-xl font-light tracking-wider">
+            <h2 className=" text-white text-xl font-light tracking-wider">
               SRI MAHALAKSHMI <span className="mx-2">—</span> SWEETS
             </h2>
           </div>
 
           <div className="flex items-center space-x-6">
-            <button className="text-white hover:text-white text-sm">
+            <button className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full">
               SEARCH
             </button>
-            <button className="text-white hover:text-white text-sm">
+            <button className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full">
               ACCOUNT
             </button>
-            <button className="text-white hover:text-white text-sm">
+            <button className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full">
               CART (0)
             </button>
           </div>
@@ -173,9 +192,12 @@ export default function HeroSection() {
           </div>
 
           {/* Main Title */}
-          <div ref={titleRef} className="relative z-10 text-center">
+          <div
+            ref={titleRef}
+            className="relative z-10 text-center -translate-y-18"
+          >
             <h1
-              className={`text-white ${anton.className} text-8xl font-light tracking-wider whitespace-nowrap`}
+              className={`title text-white ${anton.className} text-8xl font-light tracking-wider whitespace-nowrap`}
             >
               SRI MAHALAKSHMI <span className="mx-4">—</span> SWEETS
             </h1>
