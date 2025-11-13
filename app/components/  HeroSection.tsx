@@ -1,11 +1,14 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { SplitText } from "gsap/all";
 import { lato, libre, montserrat, ubuntu } from "@/lib/fonts";
+import { motion, AnimatePresence } from "framer-motion";
+import { IconMenu2, IconX } from "@tabler/icons-react";
+import GsapHamburger from "./GsapHamburger";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,6 +17,8 @@ export default function HeroSection() {
   const heroRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const descriptionRef = useRef<HTMLDivElement>(null);
+
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   useGSAP(() => {
     // ============================================
@@ -157,7 +162,7 @@ export default function HeroSection() {
       {/* Navbar */}
       <nav className="fixed top-0 left-0 w-full z-50 bg-slate-800/80 backdrop-blur-md">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-8">
             <a
               href="#"
               className="nav-link relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full"
@@ -194,7 +199,7 @@ export default function HeroSection() {
             </h2>
           </div>
 
-          <div className="flex items-center space-x-6">
+          <div className="hidden lg:flex items-center space-x-6">
             <button className="nav-link relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full">
               SEARCH
             </button>
@@ -205,7 +210,51 @@ export default function HeroSection() {
               CART (0)
             </button>
           </div>
+
+          {/* Mobile breadcrumb (hamburger) */}
+          <div className="lg:hidden">
+            <GsapHamburger isOpen={isOpen} toggle={() => setIsOpen(!isOpen)} />
+          </div>
         </div>
+
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", stiffness: 200, damping: 25 }}
+              className="fixed top-0 right-0 h-full w-3/4 sm:w-1/2 bg-slate-900 z-50 shadow-lg p-6 flex flex-col"
+            >
+              <nav className="flex flex-col space-y-6">
+                {["SHOP", "COLLECTIONS", "ABOUT US", "SIGNATURE TREATS"].map(
+                  (link) => (
+                    <a
+                      key={link}
+                      href="#"
+                      className="text-white text-lg hover:text-teal-300 transition"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {link}
+                    </a>
+                  )
+                )}
+              </nav>
+
+              <div className="mt-auto pt-8 border-t border-gray-700">
+                {["SEARCH", "ACCOUNT", "CART (0)"].map((btn) => (
+                  <button
+                    key={btn}
+                    onClick={() => setIsOpen(false)}
+                    className="text-white text-sm block w-full text-left py-2 hover:text-teal-300 transition"
+                  >
+                    {btn}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Hero Section */}
@@ -229,7 +278,7 @@ export default function HeroSection() {
             className="relative z-10 text-center -translate-y-18"
           >
             <h1
-              className={`no-select title text-white ${libre.className} text-8xl font-light tracking-wider whitespace-nowrap`}
+              className={`no-select title text-white ${libre.className} text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl  font-light tracking-wider whitespace-nowrap`}
             >
               SRI MAHALAKSHMI <span className="mx-4">—</span> SWEETS
             </h1>
@@ -241,7 +290,7 @@ export default function HeroSection() {
             className="no-select absolute bottom-20 left-12 max-w-md z-10 subtitle"
           >
             <h2
-              className={`text-white text-5xl ${libre.className} font-serif mb-4`}
+              className={`text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl  ${libre.className} font-serif mb-4`}
             >
               Traditional Indian Sweets
             </h2>
@@ -259,15 +308,14 @@ export default function HeroSection() {
       </section>
 
       {/* Content Section (to demonstrate scroll) */}
-      <section className="min-h-screen bg-white py-20">
+      {/* <section className="min-h-screen bg-white py-20">
         <div className="container mx-auto px-6">
           <h2 className="text-3xl mb-8">Our Favorites</h2>
           <p className="text-gray-600">
             Simple, effective sweets our customers choose again and again.
           </p>
-          {/* Add your product cards here */}
         </div>
-      </section>
+      </section> */}
     </>
   );
 }

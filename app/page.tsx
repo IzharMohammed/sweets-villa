@@ -12,7 +12,7 @@ export default function Home() {
       {/* Hero section */}
       <HeroSection />
       {/* Products section */}
-
+      <section className="min-h-screen bg-white py-20"></section>
       {/* Footer */}
     </div>
   );
