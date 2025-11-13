@@ -32,7 +32,8 @@ export default function GsapHamburger({
   return (
     <button
       onClick={toggle}
-      className="relative w-8 h-8 flex flex-col justify-center items-center gap-[6px] z-50"
+      // className="relative w-8 h-8 flex flex-col justify-center items-center gap-[6px] z-50"
+      className="relative w-8 h-8 flex flex-col justify-center items-center gap-[6px] z-50 transition-transform duration-200 hover:scale-110"
     >
       <span ref={topRef} className="w-6 h-[2px] bg-white block" />
       <span ref={midRef} className="w-6 h-[2px] bg-white block" />

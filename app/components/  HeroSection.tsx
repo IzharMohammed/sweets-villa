@@ -257,6 +257,16 @@ export default function HeroSection() {
         </AnimatePresence>
       </nav>
 
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.5 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black z-40"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
       {/* Hero Section */}
       <section
         ref={heroRef}
@@ -268,7 +278,7 @@ export default function HeroSection() {
             <img
               src="/sweets.png"
               alt="Sweets"
-              className="w-full h-full object-cover opacity-40"
+              className={`w-full h-full object-cover opacity-40`}
             />
           </div>
 
@@ -294,7 +304,7 @@ export default function HeroSection() {
             >
               Traditional Indian Sweets
             </h2>
-            <p className={`text-white ${montserrat.className} text-lg mb-6 `}>
+            <p className={`text-white ${montserrat.className} text-lg  mb-6`}>
               Experience the authentic taste of handcrafted sweets made with
               premium ingredients and time-honored recipes.
             </p>
