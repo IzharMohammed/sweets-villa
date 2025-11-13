@@ -5,8 +5,26 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
+import { Anton, Libre_Caslon_Display, Montserrat } from "next/font/google";
 
 gsap.registerPlugin(ScrollTrigger);
+const libre = Libre_Caslon_Display({
+  weight: "400",
+  style: "normal",
+  subsets: ["latin"],
+});
+
+const montserrat = Montserrat({
+  weight: "400",
+  style: "normal",
+  subsets: ["latin"],
+});
+
+const anton = Anton({
+  weight: "400",
+  style: "normal",
+  subsets: ["latin"],
+});
 
 export default function HeroSection() {
   const navTitleRef = useRef<HTMLDivElement>(null);
@@ -37,14 +55,17 @@ export default function HeroSection() {
     });
 
     // Fade out description
-    t1.to(descriptionRef.current,{
-      opacity:0,
-      y:50,
-      duration:0.8,
-      ease:"power2.in"
-    },0) // Start at the same time as title animation
+    t1.to(
+      descriptionRef.current,
+      {
+        opacity: 0,
+        y: 50,
+        duration: 0.8,
+        ease: "power2.in",
+      },
+      0
+    ); // Start at the same time as title animation
   }, []);
-
 
   return (
     <>
@@ -52,16 +73,16 @@ export default function HeroSection() {
       <nav className="fixed top-0 left-0 w-full z-50 bg-slate-800/80 backdrop-blur-md">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-8">
-            <a href="#" className="text-white/70 hover:text-white text-sm">
+            <a href="#" className="text-white hover:text-white text-sm">
               SHOP
             </a>
-            <a href="#" className="text-white/70 hover:text-white text-sm">
+            <a href="#" className="text-white hover:text-white text-sm">
               COLLECTIONS
             </a>
-            <a href="#" className="text-white/70 hover:text-white text-sm">
+            <a href="#" className="text-white hover:text-white text-sm">
               ABOUT US
             </a>
-            <a href="#" className="text-white/70 hover:text-white text-sm">
+            <a href="#" className="text-white hover:text-white text-sm">
               SIGNATURE TREATS
             </a>
           </div>
@@ -77,13 +98,13 @@ export default function HeroSection() {
           </div>
 
           <div className="flex items-center space-x-6">
-            <button className="text-white/70 hover:text-white text-sm">
+            <button className="text-white hover:text-white text-sm">
               SEARCH
             </button>
-            <button className="text-white/70 hover:text-white text-sm">
+            <button className="text-white hover:text-white text-sm">
               ACCOUNT
             </button>
-            <button className="text-white/70 hover:text-white text-sm">
+            <button className="text-white hover:text-white text-sm">
               CART (0)
             </button>
           </div>
@@ -107,7 +128,7 @@ export default function HeroSection() {
 
           {/* Main Title */}
           <div ref={titleRef} className="relative z-10 text-center">
-            <h1 className="text-white text-8xl font-light tracking-wider whitespace-nowrap">
+            <h1 className={`text-white ${anton.className} text-8xl font-light tracking-wider whitespace-nowrap`}>
               SRI MAHALAKSHMI <span className="mx-4">—</span> SWEETS
             </h1>
           </div>
@@ -115,16 +136,20 @@ export default function HeroSection() {
           {/* Description */}
           <div
             ref={descriptionRef}
-            className="absolute bottom-32 left-12 max-w-md z-10"
+            className="absolute bottom-20 left-12 max-w-md z-10"
           >
-            <h2 className="text-white text-4xl font-serif mb-4">
+            <h2
+              className={`text-white text-5xl ${libre.className} font-serif mb-4`}
+            >
               Traditional Indian Sweets
             </h2>
-            <p className="text-white/80 text-lg mb-6">
+            <p className={`text-white ${montserrat.className} text-lg mb-6 `}>
               Experience the authentic taste of handcrafted sweets made with
               premium ingredients and time-honored recipes.
             </p>
-            <button className="text-white text-sm tracking-wider border-b border-white pb-1 hover:opacity-70 transition-opacity">
+            <button
+              className={`text-white ${montserrat.className} text-sm tracking-wider border-b border-white pb-1 hover:opacity-70 transition-opacity`}
+            >
               SHOP NOW
             </button>
           </div>
