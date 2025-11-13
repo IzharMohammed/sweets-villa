@@ -4,6 +4,7 @@ import {
     Lato,
     Libre_Caslon_Display,
     Montserrat,
+    Ubuntu,
 } from "next/font/google";
 
 export const libre = Libre_Caslon_Display({
@@ -35,3 +36,9 @@ export const lato = Lato({
     style: "normal",
     subsets: ["latin"],
 });
+
+export const ubuntu = Ubuntu({
+    weight: "400",
+    style: "normal",
+    subsets: ["latin"]
+})

@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { SplitText } from "gsap/all";
-import { lato, libre, montserrat } from "@/lib/fonts";
+import { lato, libre, montserrat, ubuntu } from "@/lib/fonts";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -16,55 +16,129 @@ export default function HeroSection() {
   const descriptionRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    // Main animation timeline
-    const t1 = gsap.timeline({
-      scrollTrigger: {
-        trigger: heroRef.current,
-        start: "top top",
-        end: "bottom top",
-        scrub: 1.5, // Smooth scrubbing effect
-        pin: false,
-      },
-    });
+    // ============================================
+    // STEP 1: Initial entrance animations
+    // ============================================
 
-    // Animate title scaling and position
-    t1.to(titleRef.current, {
-      scale: 0.35,
-      y: -window.innerHeight / 2 + 40, // Move to navbar position
-      duration: 1,
-      ease: "power2.inOut",
-    });
-
-    // Fade out description
-    t1.to(
-      descriptionRef.current,
-      {
-        opacity: 0,
-        y: 50,
-        duration: 0.8,
-        ease: "power2.in",
-      },
-      0
-    ); // Start at the same time as title animation
-
+    // Animate title appearing on page load
     gsap.from(titleRef.current, {
-      y: 50,
-      opacity: 0,
-      duration: 1.5,
-      ease: "expo.out",
+      y: 50, // Start 50px below
+      opacity: 0, // Start invisible
+      duration: 1.5, // Take 1.5 seconds
+      ease: "expo.out", // Smooth deceleration
     });
 
-    // Show navbar title
+    // Split text into individual characters for stagger effect
+    const heroSplit = new SplitText(".title", {
+      type: "chars, words", // Break into characters and words
+    });
+
+    const paragraphSplit = new SplitText(".subtitle", {
+      type: "lines", // Break into lines
+    });
+
+    // Add gradient class to each character
+    heroSplit.chars.forEach((char) => char.classList.add("text-gradient"));
+
+    // Animate each character one by one (stagger)
+    gsap.from(heroSplit.chars, {
+      yPercent: 100, // Start 100% below (relative to char height)
+      duration: 1.8, // Each char takes 1.8s
+      ease: "expo.out",
+      stagger: 0.06, // 0.06s delay between each character
+      opacity: 0,
+      delay: 0.5,
+    });
+
+    // Animate subtitle lines
+    gsap.from(paragraphSplit.lines, {
+      opacity: 0,
+      yPercent: 100,
+      duration: 1.8,
+      ease: "expo.out",
+      stagger: 0.06,
+      delay: 1.5, // Wait 1 second before starting
+    });
+
+    gsap.from(".nav-link", {
+      y: -30, // start 30px above their final position
+      opacity: 0, // start invisible
+      duration: 0.8, // smooth duration
+      ease: "power3.out", // easing curve
+      stagger: 0.15, // each link appears 0.15s after the previous
+    });
+
+    // ============================================
+    // STEP 2: Scroll-based shrink animation (THE FIX!)
+    // ============================================
+
+    // Get navbar height dynamically
+    const navbarHeight = 60; // Adjust this to match your navbar height
+
+    // Calculate how much to move up
+    // We want the title center to align with navbar center
+    const moveUpDistance = -(window.innerHeight / 2 - navbarHeight / 2);
+
+    // Calculate scale factor to fit in navbar
+    // Get the title's current width
+    const titleWidth = titleRef.current?.offsetWidth || 1000;
+    // We want it to fit in about 30% of viewport width for navbar
+    const targetWidth = window.innerWidth * 0.25;
+    const scaleFactor = targetWidth / titleWidth;
+
+    const titleElement = titleRef.current;
+
+    if (titleElement) {
+      const titleWidth = titleElement.offsetWidth;
+      const targetWidth = window.innerWidth * 0.3;
+      const targetScale = targetWidth / titleWidth;
+      const targetY = -(window.innerHeight / 2) + navbarHeight / 2;
+
+      const t1 = gsap.timeline({
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: 1.5,
+          pin: false,
+        },
+      });
+
+      t1.to(titleElement, {
+        scale: targetScale,
+        y: targetY,
+        duration: 1,
+        ease: "power2.inOut",
+      });
+
+      t1.to(
+        descriptionRef.current,
+        {
+          opacity: 0,
+          y: 50,
+          duration: 0.8,
+          ease: "power2.in",
+        },
+        0
+      );
+    }
+
+    // ============================================
+    // STEP 3: Show navbar title when hero is gone
+    // ============================================
+
     ScrollTrigger.create({
       trigger: heroRef.current,
-      start: "bottom top",
+      start: "bottom top", // When hero completely leaves viewport
       onEnter: () => {
+        // Scrolling down past this point
         gsap.to(navTitleRef.current, {
           opacity: 1,
           duration: 0.3,
         });
       },
       onLeaveBack: () => {
+        // Scrolling back up past this point
         gsap.to(navTitleRef.current, {
           opacity: 0,
           duration: 0.3,
@@ -72,32 +146,7 @@ export default function HeroSection() {
       },
     });
 
-    const heroSplit = new SplitText(".title", {
-      type: "chars, words",
-    });
-
-    const paragraphSplit = new SplitText(".subtitle", {
-      type: "lines",
-    });
-
-    heroSplit.chars.forEach((char) => char.classList.add("text-gradient"));
-
-    gsap.from(heroSplit.chars, {
-      yPercent: 100,
-      duration: 1.8,
-      ease: "expo.out",
-      stagger: 0.06,
-    });
-
-    gsap.from(paragraphSplit.lines, {
-      opacity: 0,
-      yPercent: 100,
-      duration: 1.8,
-      ease: "expo.out",
-      stagger: 0.06,
-      delay: 1,
-    });
-
+    // Cleanup function
     return () => {
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
@@ -111,25 +160,25 @@ export default function HeroSection() {
           <div className="flex items-center space-x-8">
             <a
               href="#"
-              className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full"
+              className="nav-link relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full"
             >
               SHOP
             </a>
             <a
               href="#"
-              className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full"
+              className="nav-link relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full"
             >
               COLLECTIONS
             </a>
             <a
               href="#"
-              className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full"
+              className="nav-link relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full"
             >
               ABOUT US
             </a>
             <a
               href="#"
-              className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full"
+              className="nav-link relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full"
             >
               SIGNATURE TREATS
             </a>
@@ -146,13 +195,13 @@ export default function HeroSection() {
           </div>
 
           <div className="flex items-center space-x-6">
-            <button className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full">
+            <button className="nav-link relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full">
               SEARCH
             </button>
-            <button className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full">
+            <button className="nav-link relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full">
               ACCOUNT
             </button>
-            <button className="relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full">
+            <button className="nav-link relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full">
               CART (0)
             </button>
           </div>
@@ -180,7 +229,7 @@ export default function HeroSection() {
             className="relative z-10 text-center -translate-y-18"
           >
             <h1
-              className={`no-select title text-white ${lato.className} text-8xl font-light tracking-wider whitespace-nowrap`}
+              className={`no-select title text-white ${libre.className} text-8xl font-light tracking-wider whitespace-nowrap`}
             >
               SRI MAHALAKSHMI <span className="mx-4">—</span> SWEETS
             </h1>
