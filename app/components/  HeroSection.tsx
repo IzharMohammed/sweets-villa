@@ -7,7 +7,6 @@ import { useGSAP } from "@gsap/react";
 import { SplitText } from "gsap/all";
 import { lato, libre, montserrat, ubuntu } from "@/lib/fonts";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconMenu2, IconX } from "@tabler/icons-react";
 import GsapHamburger from "./GsapHamburger";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -117,7 +116,7 @@ export default function HeroSection() {
       });
 
       t1.to(
-        descriptionRef.current,
+        ".description",
         {
           opacity: 0,
           y: 50,
@@ -285,26 +284,28 @@ export default function HeroSection() {
           {/* Main Title */}
           <div
             ref={titleRef}
-            className="relative z-10 text-center -translate-y-18"
+            className="relative z-10 text-center -translate-y-48 lg:-translate-y-28"
           >
             <h1
               className={`no-select title text-white ${libre.className} text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl  font-light tracking-wider whitespace-nowrap`}
             >
-              SRI MAHALAKSHMI <span className="mx-4">—</span> SWEETS
+              SRI MAHALAKSHMI <span>—</span> SWEETS
             </h1>
           </div>
 
           {/* Description */}
           <div
-            ref={descriptionRef}
-            className="no-select absolute bottom-20 left-12 max-w-md z-10 subtitle"
+            // ref={descriptionRef}
+            className="no-select absolute bottom-10  left-12 max-w-sm lg:max-w-md z-10 subtitle description"
           >
             <h2
               className={`text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl  ${libre.className} font-serif mb-4`}
             >
               Traditional Indian Sweets
             </h2>
-            <p className={`text-white ${montserrat.className} text-lg  mb-6`}>
+            <p
+              className={`text-white  ${montserrat.className}  text-sm sm:text-base md:text-lg  mb-6`}
+            >
               Experience the authentic taste of handcrafted sweets made with
               premium ingredients and time-honored recipes.
             </p>
@@ -313,6 +314,22 @@ export default function HeroSection() {
             >
               SHOP NOW
             </button>
+          </div>
+
+          <div
+            // ref={descriptionRef}
+            className="no-select  absolute bottom-10 right-12 max-w-md z-10 subtitle description"
+          >
+            <h2
+              className={`text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl  ${libre.className} font-serif mb-4`}
+            >
+              ArundelPet Main Road
+            </h2>
+            <p
+              className={`text-sm sm:text-base md:text-lg ${montserrat.className} text-lg  mb-6`}
+            >
+              since 1995
+            </p>
           </div>
         </div>
       </section>
