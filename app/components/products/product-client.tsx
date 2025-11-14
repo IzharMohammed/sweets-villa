@@ -45,20 +45,16 @@ export default function ProductsClient({ products }: ProductsClientProps) {
     });
 
     // Animate category buttons
-    gsap.fromTo(
-      ".category-btn",
-      {
-        y: 30,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power3.out",
-        delay: 0.3,
+    gsap.from(".category-btn", {
+      scrollTrigger: {
+        trigger: categoriesRef.current,
+        start: "top 90%",
       },
-      {
-        opacity: 1,
-      }
-    );
+      y: 60,
+      opacity: 0,
+      duration: 1.5,
+      ease: "power1.out",
+    });
 
     // Animate product cards on scroll
     gsap.from(".product-card", {
@@ -116,14 +112,20 @@ export default function ProductsClient({ products }: ProductsClientProps) {
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`category-btn text-black hover:bg-gray-800 hover:text-white  px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-medium transition-all duration-300 ${
+              className={`category-btn relative overflow-hidden group  text-black hover:bg-gray-800 hover:text-white  px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-medium transition-all duration-300 ${
                 selectedCategory === category ||
                 (selectedCategory === null && category === "All")
                   ? "border border-black  shadow-lg scale-105"
                   : "  hover:bg-gray-100 shadow-md hover:shadow-lg"
               }`}
             >
-              {category}
+              {/* Background animation */}
+              <span className="absolute inset-0 bg-gray-800 translate-y-full group-hover:translate-y-0 transition-all duration-300"></span>
+
+              {/* Button label */}
+              <span className="relative z-10 group-hover:text-white transition-colors duration-300">
+                {category}
+              </span>
             </button>
           ))}
         </div>
@@ -140,8 +142,14 @@ export default function ProductsClient({ products }: ProductsClientProps) {
 
         {/* Shop All Button */}
         <div className="flex justify-center">
-          <button className="px-8 py-3 border-2 border-gray-800 text-gray-800 rounded-lg hover:bg-gray-800 hover:text-white transition-all duration-300 font-medium">
-            Shop all sweets
+          <button className="px-8 py-3 relative overflow-hidden group border-2 border-gray-800 text-gray-800 rounded-lg hover:bg-gray-800 hover:text-white transition-all duration-300 font-medium">
+            {/* Background animation */}
+            <span className="absolute inset-0 bg-gray-800 translate-y-full group-hover:translate-y-0 transition-all duration-300"></span>
+
+            {/* Button label */}
+            <span className="relative z-10 group-hover:text-white transition-colors duration-300">
+              Shop all sweets
+            </span>
           </button>
         </div>
       </div>
