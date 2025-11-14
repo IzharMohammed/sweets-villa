@@ -1,7 +1,7 @@
 import Image from "next/image";
-import HeroSection from "./components/  HeroSection";
-import Navbar from "./components/Navbar";
-import Products from "./components/products/products";
+import HeroSection from "../components/  HeroSection";
+import Navbar from "../components/Navbar";
+import Products from "../components/products/products";
 
 export default function Home() {
   return (
