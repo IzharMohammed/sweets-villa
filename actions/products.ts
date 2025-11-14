@@ -67,3 +67,42 @@ export async function getProducts(filters = {}) {
         };
     }
 }
+
+export async function getProductDetails(productId: string) {
+    try {
+        const headers = {
+            "Content-Type": "application/json",
+            "x-api-key": API_KEY,
+        };
+
+        // Add custom headers if user is authenticated
+        // if (userData) {
+        //     headers["x-user-id"] = userData.id;
+        // }
+
+        const response = await fetch(`${BACKEND_URL}/v1/products/${productId}`, {
+            method: "GET",
+            headers,
+            cache: "no-store", // Ensure fresh data on each request
+            next: {
+                tags: ["products"],
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            return {
+                success: false,
+                error:
+                    errorData.message ||
+                    `Server error: ${response.status}. Please try again.`,
+            };
+        }
+
+        return response.json();
+    } catch (error) {
+        console.log("Error fetching product  details:", error);
+        throw error;
+    }
+}
+

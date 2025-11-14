@@ -36,7 +36,6 @@ export default function ProductsClient({ products }: ProductsClientProps) {
       scrollTrigger: {
         trigger: titleRef.current,
         start: "top 90%",
-        // toggleActions:"play none none reverse"
       },
       y: 50,
       opacity: 0,
@@ -48,11 +47,11 @@ export default function ProductsClient({ products }: ProductsClientProps) {
     gsap.from(".category-btn", {
       scrollTrigger: {
         trigger: categoriesRef.current,
-        start: "top 90%",
+        start: "top bottom",
       },
       y: 60,
       opacity: 0,
-      duration: 1.5,
+      duration: 1,
       ease: "power1.out",
     });
 
