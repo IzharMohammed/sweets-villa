@@ -91,21 +91,51 @@ export default function ProductDetailClient({
   const handleImageSelect = (index: number) => {
     if (index === selectedImage) return;
 
+    const direction = index > selectedImage ? 1 : -1;
+
+    // Slide current image out
     gsap.to(mainImageRef.current, {
-      opacity: 0,
-      scale: 0.98,
-      duration: 0.25,
-      ease: "power2.in",
-      onComplete: () => {
-        setSelectedImage(index);
-        gsap.to(mainImageRef.current, {
-          opacity: 1,
-          scale: 1,
-          duration: 0.25,
-          ease: "power2.out",
-        });
-      },
+      x: -100 * direction + "%",
+      opacity: 0.3,
+      duration: 0.5,
+      ease: "power2.inOut",
     });
+
+    // Update image after brief delay
+    gsap.delayedCall(0.15, () => {
+      setSelectedImage(index);
+
+      //position and slide in new image
+      gsap.fromTo(
+        mainImageRef.current,
+        {
+          x: direction + "%",
+          // opacity: 0.3,
+        },
+        {
+          x: "0%",
+          opacity: 1,
+          duration: 2,
+          ease: "power2.out",
+        }
+      );
+    });
+
+    // gsap.to(mainImageRef.current, {
+    //   opacity: 0,
+    //   scale: 0.98,
+    //   duration: 0.25,
+    //   ease: "power2.in",
+    //   onComplete: () => {
+    //     setSelectedImage(index);
+    //     gsap.to(mainImageRef.current, {
+    //       opacity: 1,
+    //       scale: 1,
+    //       duration: 0.25,
+    //       ease: "power2.out",
+    //     });
+    //   },
+    // });
   };
 
   // Handle variant selection
@@ -239,18 +269,22 @@ export default function ProductDetailClient({
             onTouchStart={(e) => setTouchStart(e.targetTouches[0].clientX)}
             onTouchMove={(e) => setTouchEnd(e.targetTouches[0].clientX)}
             onTouchEnd={() => {
-              if (touchStart - touchEnd > 75) {
-                // Swipe left - next image
-                const nextIndex = (selectedImage + 1) % product.image.length;
-                handleImageSelect(nextIndex);
-              }
-              if (touchStart - touchEnd < -75) {
-                // Swipe right - previous image
-                const prevIndex =
-                  selectedImage === 0
-                    ? product.image.length - 1
-                    : selectedImage - 1;
-                handleImageSelect(prevIndex);
+              const swipeThreshold = 75;
+              const swipeDistance = touchStart - touchEnd;
+
+              if (Math.abs(swipeDistance) > swipeThreshold) {
+                if (swipeDistance > 0) {
+                  // Swipe left - next image
+                  const nextIndex = (selectedImage + 1) % product.image.length;
+                  handleImageSelect(nextIndex);
+                } else {
+                  // Swipe right - previous image
+                  const prevIndex =
+                    selectedImage === 0
+                      ? product.image.length - 1
+                      : selectedImage - 1;
+                  handleImageSelect(prevIndex);
+                }
               }
             }}
           >
