@@ -89,6 +89,8 @@ export async function getProductDetails(productId: string) {
             },
         });
 
+        console.log("product details", response);
+
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             return {

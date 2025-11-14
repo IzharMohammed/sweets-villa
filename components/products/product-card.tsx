@@ -3,11 +3,12 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import gsap from "gsap";
 import { Product } from "@/types/product";
+import { useRouter } from "next/navigation";
 
 export default function ProductCard({ product }: { product: Product }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
-
+  const router = useRouter();
   useGSAP(() => {
     if (isHovered) {
       gsap.to(cardRef.current, {
@@ -19,7 +20,7 @@ export default function ProductCard({ product }: { product: Product }) {
       gsap.to(cardRef.current, {
         y: 0,
         duration: 0.3,
-        ease: "power2.out",
+        ease: "power2.out", 
       });
     }
   }, [isHovered]);
@@ -33,6 +34,7 @@ export default function ProductCard({ product }: { product: Product }) {
       className="product-card group cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => router.push(`/products/${product.id}`)}
     >
       {/* Image Container */}
       <div className="relative aspect-[4/5] bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl overflow-hidden mb-4 shadow-md">

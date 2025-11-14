@@ -1,0 +1,371 @@
+"use client";
+
+import { useRef, useState } from "react";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
+import Image from "next/image";
+import { lato, montserrat } from "@/lib/fonts";
+
+interface Variant {
+  id: string;
+  discount: number;
+  price: number;
+  stock: number;
+  unit: string;
+  quantity: number;
+  position: number;
+  isDefault: boolean;
+}
+
+interface Product {
+  id: string;
+  category: string;
+  name: string;
+  description: string;
+  image: string[];
+  variants: Variant[];
+}
+
+interface ProductDetailClientProps {
+  product: Product;
+}
+
+export default function ProductDetailClient({
+  product,
+}: ProductDetailClientProps) {
+  const mainImageRef = useRef<HTMLDivElement>(null);
+  const thumbnailsRef = useRef<HTMLDivElement>(null);
+  const detailsRef = useRef<HTMLDivElement>(null);
+  const descriptionRef = useRef<HTMLDivElement>(null);
+  const plusIconRef = useRef<SVGSVGElement>(null);
+
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [selectedVariant, setSelectedVariant] = useState<Variant>(
+    product.variants.find((v) => v.isDefault) || product.variants[0]
+  );
+  const [quantity, setQuantity] = useState(1);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
+  // Initial mount animation
+  useGSAP(() => {
+    const tl = gsap.timeline();
+
+    // Animate thumbnails
+    tl.from(".thumbnail-item", {
+      scale: 0.8,
+      opacity: 0,
+      duration: 0.5,
+      stagger: 0.08,
+      ease: "back.out(1.4)",
+    });
+
+    // Animate main image
+    tl.from(
+      mainImageRef.current,
+      {
+        scale: 0.95,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power3.out",
+      },
+      "-=0.3"
+    );
+
+    // Animate product details
+    tl.from(
+      detailsRef.current,
+      {
+        x: 50,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power3.out",
+      },
+      "-=0.6"
+    );
+  }, []);
+
+  // Handle image change animation
+  const handleImageSelect = (index: number) => {
+    if (index === selectedImage) return;
+
+    gsap.to(mainImageRef.current, {
+      opacity: 0,
+      scale: 0.98,
+      duration: 0.25,
+      ease: "power2.in",
+      onComplete: () => {
+        setSelectedImage(index);
+        gsap.to(mainImageRef.current, {
+          opacity: 1,
+          scale: 1,
+          duration: 0.25,
+          ease: "power2.out",
+        });
+      },
+    });
+  };
+
+  // Handle variant selection
+  const handleVariantSelect = (variant: Variant) => {
+    setSelectedVariant(variant);
+    setQuantity(1);
+
+    // Animate price change
+    gsap.from(".price-display", {
+      scale: 1.05,
+      duration: 0.3,
+      ease: "back.out(2)",
+    });
+  };
+
+  // Toggle product details
+  const toggleDetails = () => {
+    const newState = !isDetailsOpen;
+    setIsDetailsOpen(newState);
+
+    if (newState) {
+      // Transform + to X
+      gsap.to(plusIconRef.current, {
+        rotation: 45,
+        duration: 0.3,
+        ease: "power2.out",
+      });
+
+      // Expand description
+      gsap.to(descriptionRef.current, {
+        height: "auto",
+        opacity: 1,
+        duration: 0.4,
+        ease: "power2.out",
+      });
+    } else {
+      // Transform X to +
+      gsap.to(plusIconRef.current, {
+        rotation: 0,
+        duration: 0.3,
+        ease: "power2.out",
+      });
+
+      // Collapse description
+      gsap.to(descriptionRef.current, {
+        height: 0,
+        opacity: 0,
+        duration: 0.3,
+        ease: "power2.in",
+      });
+    }
+  };
+
+  const totalPrice = selectedVariant.price * quantity;
+
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="grid grid-cols-1 lg:grid-cols-2">
+        {/* LEFT SIDE - Full Height Image */}
+        <div className="relative h-[50vh] lg:h-screen lg:sticky lg:top-0">
+          {/* Image Gallery - Positioned at top */}
+          <div
+            ref={thumbnailsRef}
+            className="absolute top-4 left-4 right-4 z-10 flex gap-2 overflow-x-auto pb-2"
+          >
+            {product.image.map((img, index) => (
+              <button
+                key={index}
+                onClick={() => handleImageSelect(index)}
+                className={`thumbnail-item flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden transition-all ${
+                  selectedImage === index
+                    ? "ring-4 ring-white shadow-2xl scale-105"
+                    : "ring-2 ring-white/50 hover:ring-white/80"
+                }`}
+              >
+                <Image
+                  src={img}
+                  alt={`${product.name} - ${index + 1}`}
+                  width={80}
+                  height={80}
+                  className="w-full h-full object-cover"
+                />
+              </button>
+            ))}
+          </div>
+
+          {/* Main Image - Full Container */}
+          <div
+            ref={mainImageRef}
+            className="relative w-full h-full bg-gradient-to-br from-amber-50 to-orange-100"
+          >
+            <Image
+              src={product.image[selectedImage]}
+              alt={product.name}
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+        </div>
+
+        {/* RIGHT SIDE - Product Details */}
+        <div ref={detailsRef} className="px-6 py-8 sm:px-12 sm:py-12 lg:px-16">
+          {/* Rating */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="flex text-yellow-500 text-sm">
+              {[...Array(5)].map((_, i) => (
+                <span key={i}>★</span>
+              ))}
+            </div>
+            <span className="text-sm text-gray-600">5.0</span>
+          </div>
+
+          {/* Product Name */}
+          <h1
+            className={`${lato.className} text-3xl sm:text-4xl font-normal text-gray-900 mb-3`}
+          >
+            {product.name}
+          </h1>
+
+          {/* Price */}
+          <div className="price-display flex items-baseline gap-2 mb-6">
+            <span className="text-4xl font-bold text-gray-900">
+              ₹{selectedVariant.price}
+            </span>
+            <span className="text-base text-gray-500 uppercase">
+              / {selectedVariant.unit}
+            </span>
+          </div>
+
+          {/* Short Description */}
+          <p
+            className={`${montserrat.className} text-gray-700 mb-6 leading-relaxed text-base`}
+          >
+            {product.description.slice(0, 200)}...
+          </p>
+
+          {/* Key Features */}
+          <div className="space-y-2 mb-8">
+            <div className="flex items-start gap-3 text-sm text-gray-700">
+              <span className="mt-1.5">•</span>
+              <span>Premium quality ingredients</span>
+            </div>
+            <div className="flex items-start gap-3 text-sm text-gray-700">
+              <span className="mt-1.5">•</span>
+              <span>Freshly made daily</span>
+            </div>
+            <div className="flex items-start gap-3 text-sm text-gray-700">
+              <span className="mt-1.5">•</span>
+              <span>Traditional recipe</span>
+            </div>
+          </div>
+
+          {/* Size/Variants */}
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">Size</h3>
+            <div className="flex flex-wrap gap-2">
+              {product.variants.map((variant) => (
+                <button
+                  key={variant.id}
+                  onClick={() => handleVariantSelect(variant)}
+                  className={`px-6 py-3 rounded-lg border text-sm font-medium transition-all ${
+                    selectedVariant.id === variant.id
+                      ? "border-gray-900 bg-gray-900 text-white"
+                      : "border-gray-300 bg-white text-gray-900 hover:border-gray-900"
+                  }`}
+                >
+                  {variant.quantity} {variant.unit.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Quantity */}
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">
+              Quantity
+            </h3>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center border border-gray-300 rounded-lg">
+                <button
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="w-12 h-12 flex items-center justify-center text-gray-900 hover:bg-gray-50 text-xl"
+                >
+                  −
+                </button>
+                <span className="w-12 text-center text-lg font-medium text-gray-900">
+                  {quantity}
+                </span>
+                <button
+                  onClick={() =>
+                    setQuantity(Math.min(selectedVariant.stock, quantity + 1))
+                  }
+                  className="w-12 h-12 flex items-center justify-center text-gray-900 hover:bg-gray-50 text-xl"
+                >
+                  +
+                </button>
+              </div>
+              <span className="text-sm text-gray-600">
+                {selectedVariant.stock} available
+              </span>
+            </div>
+          </div>
+
+          {/* Add to Cart Button */}
+          <button className="w-full bg-gray-900 text-white py-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors mb-3 text-sm uppercase tracking-wide">
+            ADD TO CART — ₹{totalPrice}
+          </button>
+
+          {/* Find Nearest Store */}
+          <button className="w-full border border-gray-900 text-gray-900 py-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors mb-8 text-sm uppercase tracking-wide">
+            FIND NEAREST STORE
+          </button>
+
+          {/* Product Details Accordion */}
+          <div className="border-t border-gray-200 pt-6">
+            <button
+              onClick={toggleDetails}
+              className="w-full flex items-center justify-between text-left group"
+            >
+              <h3 className="text-base font-semibold text-gray-900">
+                Product Details
+              </h3>
+              <svg
+                ref={plusIconRef}
+                className="w-5 h-5 text-gray-900"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+            </button>
+
+            <div ref={descriptionRef} className="overflow-hidden h-0 opacity-0">
+              <div className="pt-4 pb-2">
+                <p className="text-gray-700 leading-relaxed text-sm mb-4">
+                  {product.description}
+                </p>
+                <div className="space-y-2 text-sm">
+                  <p className="text-gray-700">
+                    <span className="font-semibold">Category:</span>{" "}
+                    {product.category}
+                  </p>
+                  <p className="text-gray-700">
+                    <span className="font-semibold">Weight:</span>{" "}
+                    {selectedVariant.quantity} {selectedVariant.unit}
+                  </p>
+                  <p className="text-gray-700">
+                    <span className="font-semibold">Stock:</span>{" "}
+                    {selectedVariant.stock} units available
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
