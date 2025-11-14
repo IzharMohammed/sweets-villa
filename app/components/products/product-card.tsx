@@ -1,8 +1,8 @@
 import { useGSAP } from "@gsap/react";
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { Product } from "./product-client";
 import gsap from "gsap";
+import { Product } from "@/types/product";
 
 export default function ProductCard({ product }: { product: Product }) {
   const cardRef = useRef<HTMLDivElement>(null);

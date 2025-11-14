@@ -6,28 +6,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import Image from "next/image";
 import ProductCard from "./product-card";
+import { ProductsClientProps } from "@/types/product";
 
 gsap.registerPlugin(ScrollTrigger);
-
-interface Variant {
-  discount: number;
-  price: number;
-  stock: number;
-}
-
-export interface Product {
-  id: string;
-  category: string;
-  name: string;
-  description: string;
-  image: string[];
-  variants: Variant[];
-  createdAt: string;
-}
-
-interface ProductsClientProps {
-  products: Product[];
-}
 
 export default function ProductsClient({ products }: ProductsClientProps) {
   const sectionRef = useRef<HTMLDivElement>(null);
