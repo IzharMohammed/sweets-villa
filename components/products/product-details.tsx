@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import Image from "next/image";
-import { lato, montserrat } from "@/lib/fonts";
+import { geist, lato, libre, montserrat, ubuntu } from "@/lib/fonts";
 
 interface Variant {
   id: string;
@@ -45,6 +45,9 @@ export default function ProductDetailClient({
   );
   const [quantity, setQuantity] = useState(1);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
 
   // Initial mount animation
   useGSAP(() => {
@@ -163,8 +166,8 @@ export default function ProductDetailClient({
     <div className="min-h-screen bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2">
         {/* LEFT SIDE - Full Height Image */}
-        <div className="relative h-[50vh] lg:h-screen lg:sticky lg:top-0">
-          {/* Image Gallery - Positioned at top */}
+        {/* <div className="relative h-[50vh] lg:h-screen lg:sticky lg:top-0">
+          Image Gallery - Positioned at top 
           <div
             ref={thumbnailsRef}
             className="absolute top-[34%] left-4 right-4 z-10 flex flex-col justify-center  gap-2 overflow-x-auto pb-2"
@@ -188,7 +191,7 @@ export default function ProductDetailClient({
             ))}
           </div>
 
-          {/* Main Image - Full Container */}
+         Main Image - Full Container 
           <div
             ref={mainImageRef}
             className="relative w-full h-full bg-gradient-to-br from-amber-50 to-orange-100"
@@ -200,6 +203,77 @@ export default function ProductDetailClient({
               className="object-cover"
               priority
             />
+          </div>
+        </div> */}
+
+        {/* LEFT SIDE - Full Height Image */}
+        <div className="relative h-[50vh] lg:h-screen lg:sticky lg:top-0">
+          {/* Image Gallery - Positioned at top - HIDE ON MOBILE */}
+          <div
+            ref={thumbnailsRef}
+            className="hidden lg:flex absolute top-4 left-4 z-10 flex-col gap-2"
+          >
+            {product.image.map((img, index) => (
+              <button
+                key={index}
+                onClick={() => handleImageSelect(index)}
+                className={`thumbnail-item flex-shrink-0 w-20 h-20 bg-white p-0.5 overflow-hidden transition-all ${
+                  selectedImage === index ? "border border-black" : ""
+                }`}
+              >
+                <Image
+                  src={img}
+                  alt={`${product.name} - ${index + 1}`}
+                  width={80}
+                  height={80}
+                  className="w-full h-full object-cover"
+                />
+              </button>
+            ))}
+          </div>
+
+          {/* Main Image - Full Container with Swipe */}
+          <div
+            ref={mainImageRef}
+            className="relative w-full h-full bg-gradient-to-br from-amber-50 to-orange-100"
+            onTouchStart={(e) => setTouchStart(e.targetTouches[0].clientX)}
+            onTouchMove={(e) => setTouchEnd(e.targetTouches[0].clientX)}
+            onTouchEnd={() => {
+              if (touchStart - touchEnd > 75) {
+                // Swipe left - next image
+                const nextIndex = (selectedImage + 1) % product.image.length;
+                handleImageSelect(nextIndex);
+              }
+              if (touchStart - touchEnd < -75) {
+                // Swipe right - previous image
+                const prevIndex =
+                  selectedImage === 0
+                    ? product.image.length - 1
+                    : selectedImage - 1;
+                handleImageSelect(prevIndex);
+              }
+            }}
+          >
+            <Image
+              src={product.image[selectedImage]}
+              alt={product.name}
+              fill
+              className="object-cover"
+              priority
+            />
+
+            {/* Dot Indicators - MOBILE ONLY */}
+            <div className="lg:hidden absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
+              {product.image.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleImageSelect(index)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    selectedImage === index ? "bg-white w-6" : "bg-white/50"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
@@ -217,26 +291,26 @@ export default function ProductDetailClient({
 
           {/* Product Name */}
           <h1
-            className={`${lato.className} text-3xl sm:text-4xl font-normal text-gray-900 mb-3`}
+            className={`${libre.className} text-3xl sm:text-4xl font-normal text-gray-900 mb-3`}
           >
             {product.name}
           </h1>
 
           {/* Price */}
           <div className="price-display flex items-baseline gap-2 mb-6">
-            <span className="text-4xl font-bold text-gray-900">
+            <span className={`${lato.className}  font-bold text-gray-900`}>
               ₹{selectedVariant.price}
             </span>
-            <span className="text-base text-gray-500 uppercase">
+            {/* <span className="text-gray-900 uppercase">
               / {selectedVariant.unit}
-            </span>
+            </span> */}
           </div>
 
           {/* Short Description */}
           <p
             className={`${montserrat.className} text-gray-700 mb-6 leading-relaxed text-base`}
           >
-            {product.description.slice(0, 200)}...
+            {product.description}
           </p>
 
           {/* Key Features */}
@@ -307,12 +381,16 @@ export default function ProductDetailClient({
           </div>
 
           {/* Add to Cart Button */}
-          <button className="w-full bg-gray-900 text-white py-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors mb-3 text-sm uppercase tracking-wide">
+          <button
+            className={`w-full bg-gray-800 text-white py-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors mb-3 text-sm uppercase tracking-wide ${montserrat.className}`}
+          >
             ADD TO CART — ₹{totalPrice}
           </button>
 
           {/* Find Nearest Store */}
-          <button className="w-full border border-gray-900 text-gray-900 py-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors mb-8 text-sm uppercase tracking-wide">
+          <button
+            className={`w-full border border-gray-900 text-gray-900 py-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors mb-8 text-sm uppercase tracking-wide ${montserrat.className}`}
+          >
             FIND NEAREST STORE
           </button>
 
@@ -320,9 +398,9 @@ export default function ProductDetailClient({
           <div className="border-t border-gray-200 pt-6">
             <button
               onClick={toggleDetails}
-              className="w-full flex items-center justify-between text-left group"
+              className="w-full cursor-pointer flex items-center justify-between text-left group"
             >
-              <h3 className="text-base font-semibold text-gray-900">
+              <h3 className={`text-2xl text-gray-900 ${libre.className}`}>
                 Product Details
               </h3>
               <svg
