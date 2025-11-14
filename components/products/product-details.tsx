@@ -196,47 +196,6 @@ export default function ProductDetailClient({
     <div className="min-h-screen bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2">
         {/* LEFT SIDE - Full Height Image */}
-        {/* <div className="relative h-[50vh] lg:h-screen lg:sticky lg:top-0">
-          Image Gallery - Positioned at top 
-          <div
-            ref={thumbnailsRef}
-            className="absolute top-[34%] left-4 right-4 z-10 flex flex-col justify-center  gap-2 overflow-x-auto pb-2"
-          >
-            {product.image.map((img, index) => (
-              <button
-                key={index}
-                onClick={() => handleImageSelect(index)}
-                className={`thumbnail-item flex-shrink-0 w-16 h-106 bg-white sm:w-20 sm:h-20 p-0.5 overflow-hidden transition-all ${
-                  selectedImage === index ? "border border-black" : ""
-                }`}
-              >
-                <Image
-                  src={img}
-                  alt={`${product.name} - ${index + 1}`}
-                  width={80}
-                  height={80}
-                  className="w-full h-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
-
-         Main Image - Full Container 
-          <div
-            ref={mainImageRef}
-            className="relative w-full h-full bg-gradient-to-br from-amber-50 to-orange-100"
-          >
-            <Image
-              src={product.image[selectedImage]}
-              alt={product.name}
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-        </div> */}
-
-        {/* LEFT SIDE - Full Height Image */}
         <div className="relative h-[50vh] lg:h-screen lg:sticky lg:top-0">
           {/* Image Gallery - Positioned at top - HIDE ON MOBILE */}
           <div
