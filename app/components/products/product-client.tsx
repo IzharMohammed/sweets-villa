@@ -34,20 +34,29 @@ export default function ProductsClient({ products }: ProductsClientProps) {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const categoriesRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
-  
+
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   // Get unique categories
-  const categories = ["All", ...Array.from(new Set(products.map(p => p.category)))];
+  const categories = [
+    "All",
+    ...Array.from(new Set(products.map((p) => p.category))),
+  ];
 
   // Filter products based on selected category
-  const filteredProducts = selectedCategory && selectedCategory !== "All"
-    ? products.filter(p => p.category === selectedCategory)
-    : products;
+  const filteredProducts =
+    selectedCategory && selectedCategory !== "All"
+      ? products.filter((p) => p.category === selectedCategory)
+      : products;
 
   useGSAP(() => {
     // Animate title on mount
     gsap.from(titleRef.current, {
+      scrollTrigger: {
+        trigger: titleRef.current,
+        start: "top 90%",
+        // toggleActions:"play none none reverse"
+      },
       y: 50,
       opacity: 0,
       duration: 1,
@@ -55,14 +64,20 @@ export default function ProductsClient({ products }: ProductsClientProps) {
     });
 
     // Animate category buttons
-    gsap.from(".category-btn", {
-      y: 30,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.1,
-      ease: "power3.out",
-      delay: 0.3,
-    });
+    gsap.fromTo(
+      ".category-btn",
+      {
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: "power3.out",
+        delay: 0.3,
+      },
+      {
+        opacity: 1,
+      }
+    );
 
     // Animate product cards on scroll
     gsap.from(".product-card", {
@@ -74,13 +89,13 @@ export default function ProductsClient({ products }: ProductsClientProps) {
       y: 60,
       opacity: 0,
       scale: 0.9,
-      duration: 0.8,
-      stagger: 0.15,
+      duration: 1.5,
+      stagger: 0.2,
       ease: "power3.out",
     });
 
     return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
   }, []);
 
@@ -120,10 +135,11 @@ export default function ProductsClient({ products }: ProductsClientProps) {
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`category-btn px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-medium transition-all duration-300 ${
-                selectedCategory === category || (selectedCategory === null && category === "All")
-                  ? "bg-gray-800 text-white shadow-lg scale-105"
-                  : "bg-white text-gray-700 hover:bg-gray-100 shadow-md hover:shadow-lg"
+              className={`category-btn text-black hover:bg-gray-800 hover:text-white  px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-medium transition-all duration-300 ${
+                selectedCategory === category ||
+                (selectedCategory === null && category === "All")
+                  ? "border border-black  shadow-lg scale-105"
+                  : "  hover:bg-gray-100 shadow-md hover:shadow-lg"
               }`}
             >
               {category}
