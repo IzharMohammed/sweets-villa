@@ -50,14 +50,14 @@ export default function ProductDetailClient({
   useGSAP(() => {
     const tl = gsap.timeline();
 
-    // Animate thumbnails
-    tl.from(".thumbnail-item", {
-      scale: 0.8,
-      opacity: 0,
-      duration: 0.5,
-      stagger: 0.08,
-      ease: "back.out(1.4)",
-    });
+    // // Animate thumbnails
+    // tl.from(".thumbnail-item", {
+    //   scale: 0.8,
+    //   opacity: 0,
+    //   duration: 0.5,
+    //   stagger: 0.08,
+    //   ease: "back.out(1.4)",
+    // });
 
     // Animate main image
     tl.from(
@@ -157,6 +157,7 @@ export default function ProductDetailClient({
   };
 
   const totalPrice = selectedVariant.price * quantity;
+  console.log(product);
 
   return (
     <div className="min-h-screen bg-white">
@@ -166,16 +167,14 @@ export default function ProductDetailClient({
           {/* Image Gallery - Positioned at top */}
           <div
             ref={thumbnailsRef}
-            className="absolute top-4 left-4 right-4 z-10 flex gap-2 overflow-x-auto pb-2"
+            className="absolute top-[34%] left-4 right-4 z-10 flex flex-col justify-center  gap-2 overflow-x-auto pb-2"
           >
             {product.image.map((img, index) => (
               <button
                 key={index}
                 onClick={() => handleImageSelect(index)}
-                className={`thumbnail-item flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden transition-all ${
-                  selectedImage === index
-                    ? "ring-4 ring-white shadow-2xl scale-105"
-                    : "ring-2 ring-white/50 hover:ring-white/80"
+                className={`thumbnail-item flex-shrink-0 w-16 h-106 bg-white sm:w-20 sm:h-20 p-0.5 overflow-hidden transition-all ${
+                  selectedImage === index ? "border border-black" : ""
                 }`}
               >
                 <Image
