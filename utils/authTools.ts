@@ -1,126 +1,114 @@
 import "server-only";
 import { cookies } from "next/headers";
 
-class CookieManager {
-    AUTH_TOKEN_KEY = "auth_token";
-    USER_DATA_KEY = "user_data";
-    GUEST_TOKEN_KEY = "guest_token";
+interface LoginResponse {
+    token: string;
+    user: {
+        id: string | number;
+        [key: string]: any;
+    };
+}
 
-    // ========== Authenticated User Methods ==========
-    async setAuthenticatedUser(loginResponse: any) {
+export class CookieManager {
+    private AUTH_TOKEN_KEY = "auth_token";
+    private USER_DATA_KEY = "user_data";
+    private GUEST_TOKEN_KEY = "guest_token";
+
+    // ========= AUTHENTICATED USER =========
+    async setAuthenticatedUser(loginResponse: LoginResponse): Promise<void> {
         const cookieStore = await cookies();
 
-        // Set token cookie with security options
         cookieStore.set(this.AUTH_TOKEN_KEY, loginResponse.token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "lax",
-            maxAge: 60 * 60 * 24 * 90, // 90 days
+            maxAge: 60 * 60 * 24 * 90,
         });
 
-        // Set user data cookie
         cookieStore.set(this.USER_DATA_KEY, JSON.stringify(loginResponse.user), {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "lax",
-            maxAge: 60 * 60 * 24 * 90, // 90 days
+            maxAge: 60 * 60 * 24 * 90,
         });
 
-        // Clear guest token when user logs in
         await this.clearGuestToken();
     }
 
-    async getAuthUser() {
+    async getAuthUser(): Promise<Record<string, any> | null> {
         const cookieStore = await cookies();
         const userData = cookieStore.get(this.USER_DATA_KEY);
 
-        if (!userData?.value) {
-            return null;
-        }
+        if (!userData?.value) return null;
 
         try {
-            // Decode the URL-encoded value first
-            const decodedValue = decodeURIComponent(userData.value);
-            return JSON.parse(decodedValue);
+            const decoded = decodeURIComponent(userData.value);
+            return JSON.parse(decoded);
         } catch (error) {
-            console.error("Error parsing user data from cookie:", error);
+            console.error("Error parsing user cookie:", error);
             return null;
         }
     }
 
-    async getAuthToken() {
+    async getAuthToken(): Promise<string | null> {
         const cookieStore = await cookies();
-        const token = cookieStore.get(this.AUTH_TOKEN_KEY);
-        return token?.value || null;
+        return cookieStore.get(this.AUTH_TOKEN_KEY)?.value || null;
     }
 
-    async clearAuthCookies() {
+    async clearAuthCookies(): Promise<void> {
         const cookieStore = await cookies();
         cookieStore.delete(this.AUTH_TOKEN_KEY);
         cookieStore.delete(this.USER_DATA_KEY);
     }
 
-    async isAuthenticated() {
+    async isAuthenticated(): Promise<boolean> {
         const token = await this.getAuthToken();
         const user = await this.getAuthUser();
         return !!(token && user);
     }
 
-    // ========== Guest Token Methods ==========
-    async setGuestToken(token) {
+    // ========= GUEST TOKEN =========
+    async setGuestToken(token: string): Promise<void> {
         const cookieStore = await cookies();
         cookieStore.set(this.GUEST_TOKEN_KEY, token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "lax",
-            maxAge: 60 * 60 * 24 * 90, // 90 days (matching backend)
+            maxAge: 60 * 60 * 24 * 90,
             path: "/",
         });
     }
 
-    async getGuestToken() {
+    async getGuestToken(): Promise<string | null> {
         const cookieStore = await cookies();
-        const token = cookieStore.get(this.GUEST_TOKEN_KEY);
-        return token?.value || null;
+        return cookieStore.get(this.GUEST_TOKEN_KEY)?.value || null;
     }
 
-    async clearGuestToken() {
+    async clearGuestToken(): Promise<void> {
         const cookieStore = await cookies();
         cookieStore.delete(this.GUEST_TOKEN_KEY);
     }
 
-    // ========== Unified API Headers Method ==========
-    /**
-     * Builds headers for API requests with auth or guest token
-     * @returns {Promise<Record<string, string>>}
-     */
-
-    async buildApiHeaders() {
-        const headers = {
+    // ========= API BUILD HEADERS =========
+    async buildApiHeaders(): Promise<Record<string, string>> {
+        const headers: Record<string, string> = {
             "Content-Type": "application/json",
             "x-api-key": process.env.BACKEND_API_KEY || "",
         };
 
-        // Check if user is authenticated
         const user = await this.getAuthUser();
         if (user?.id) {
-            headers["x-customer-id"] = user.id;
+            headers["x-customer-id"] = String(user.id);
         } else {
-            // Add guest token for unauthenticated users
             const guestToken = await this.getGuestToken();
-            if (guestToken) {
-                headers["x-guest-token"] = guestToken;
-            }
+            if (guestToken) headers["x-guest-token"] = guestToken;
         }
 
         return headers;
     }
 
-    /**
-     * Handles API response and stores guest token if present
-     * @param {Response} response - Fetch API response object
-     */
-    async handleApiResponse(response) {
+    // ========= HANDLE RESPONSE =========
+    async handleApiResponse(response: Response): Promise<void> {
         const newGuestToken = response.headers.get("x-guest-token");
         if (newGuestToken) {
             await this.setGuestToken(newGuestToken);
