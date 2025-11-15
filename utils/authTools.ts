@@ -19,7 +19,7 @@ export class CookieManager {
         const cookieStore = await cookies();
 
         cookieStore.set(this.AUTH_TOKEN_KEY, loginResponse.token, {
-            httpOnly: true,
+            httpOnly: false,
             secure: process.env.NODE_ENV === "production",
             sameSite: "lax",
             maxAge: 60 * 60 * 24 * 90,
