@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import Image from "next/image";
@@ -49,6 +49,16 @@ export default function ProductDetailClient({
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
 
+  // const mainImageRef = useRef(null);
+  const slidesRef = useRef(null);
+  const [slideIndex, setSlideIndex] = useState(0);
+
+  const startX = useRef(0);
+  const currentX = useRef(0);
+  const isDragging = useRef(false);
+
+  const slideCount = product.image.length;
+
   // Initial mount animation
   useGSAP(() => {
     const tl = gsap.timeline();
@@ -92,34 +102,41 @@ export default function ProductDetailClient({
     if (index === selectedImage) return;
 
     const direction = index > selectedImage ? 1 : -1;
+    setSelectedImage(index);
 
+    // Slide to selected index
+    gsap.to(".slides", {
+      x: `-${index * 100}%`,
+      duration: 0.8,
+      ease: "power3.inOut",
+    });
     // Slide current image out
-    gsap.to(mainImageRef.current, {
-      x: -100 * direction + "%",
-      opacity: 0.3,
-      duration: 0.5,
-      ease: "power2.inOut",
-    });
+    // gsap.to(mainImageRef.current, {
+    //   x: -100 * direction + "%",
+    //   opacity: 0.3,
+    //   duration: 0.5,
+    //   ease: "power2.inOut",
+    // });
 
-    // Update image after brief delay
-    gsap.delayedCall(0.15, () => {
-      setSelectedImage(index);
+    // // Update image after brief delay
+    // gsap.delayedCall(0.15, () => {
+    //   setSelectedImage(index);
 
-      //position and slide in new image
-      gsap.fromTo(
-        mainImageRef.current,
-        {
-          x: direction + "%",
-          // opacity: 0.3,
-        },
-        {
-          x: "0%",
-          opacity: 1,
-          duration: 2,
-          ease: "power2.out",
-        }
-      );
-    });
+    //   //position and slide in new image
+    //   gsap.fromTo(
+    //     mainImageRef.current,
+    //     {
+    //       x: direction + "%",
+    //       // opacity: 0.3,
+    //     },
+    //     {
+    //       x: "0%",
+    //       opacity: 1,
+    //       duration: 2,
+    //       ease: "power2.out",
+    //     }
+    //   );
+    // });
 
     // gsap.to(mainImageRef.current, {
     //   opacity: 0,
@@ -189,6 +206,70 @@ export default function ProductDetailClient({
     }
   };
 
+  // Move to specific slide
+  const goToSlide = (index: number) => {
+    setSlideIndex(index);
+
+    gsap.to(slidesRef.current, {
+      x: `-${index * 100}%`,
+      duration: 0.5,
+      ease: "power2.out",
+    });
+  };
+
+  // Detect swipe start
+  const handleTouchStart = (e: any) => {
+    isDragging.current = true;
+    startX.current = e.touches ? e.touches[0].clientX : e.clientX;
+  };
+
+  // Track user finger
+  const handleTouchMove = (e: any) => {
+    if (!isDragging.current) return;
+
+    currentX.current = e.touches ? e.touches[0].clientX : e.clientX;
+  };
+
+  // On release → determine direction
+  const handleTouchEnd = () => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+
+    const diff = startX.current - currentX.current;
+
+    if (diff > 50) {
+      // Swipe LEFT → Next
+      if (slideIndex < slideCount - 1) goToSlide(slideIndex + 1);
+    } else if (diff < -50) {
+      // Swipe RIGHT → Prev
+      if (slideIndex > 0) goToSlide(slideIndex - 1);
+    }
+  };
+
+  useEffect(() => {
+    const slider = mainImageRef.current!;
+
+    slider.addEventListener("touchstart", handleTouchStart);
+    slider.addEventListener("touchmove", handleTouchMove);
+    slider.addEventListener("touchend", handleTouchEnd);
+
+    slider.addEventListener("mousedown", handleTouchStart);
+    slider.addEventListener("mousemove", handleTouchMove);
+    slider.addEventListener("mouseup", handleTouchEnd);
+    slider.addEventListener("mouseleave", handleTouchEnd);
+
+    return () => {
+      slider.removeEventListener("touchstart", handleTouchStart);
+      slider.removeEventListener("touchmove", handleTouchMove);
+      slider.removeEventListener("touchend", handleTouchEnd);
+
+      slider.removeEventListener("mousedown", handleTouchStart);
+      slider.removeEventListener("mousemove", handleTouchMove);
+      slider.removeEventListener("mouseup", handleTouchEnd);
+      slider.removeEventListener("mouseleave", handleTouchEnd);
+    };
+  }, [slideIndex]);
+
   const totalPrice = selectedVariant.price * quantity;
   console.log(product);
 
@@ -222,7 +303,7 @@ export default function ProductDetailClient({
           </div>
 
           {/* Main Image - Full Container with Swipe */}
-          <div
+          {/* <div
             ref={mainImageRef}
             className="relative w-full h-full bg-gradient-to-br from-amber-50 to-orange-100"
             onTouchStart={(e) => setTouchStart(e.targetTouches[0].clientX)}
@@ -255,7 +336,7 @@ export default function ProductDetailClient({
               priority
             />
 
-            {/* Dot Indicators - MOBILE ONLY */}
+            Dot Indicators - MOBILE ONLY 
             <div className="lg:hidden absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
               {product.image.map((_, index) => (
                 <button
@@ -265,6 +346,28 @@ export default function ProductDetailClient({
                     selectedImage === index ? "bg-white w-6" : "bg-white/50"
                   }`}
                 />
+              ))}
+            </div>
+          </div>   */}
+
+          <div
+            ref={mainImageRef}
+            className="relative w-full h-full overflow-hidden touch-pan-y"
+          >
+            <div
+              ref={slidesRef}
+              className="slides flex w-full h-full"
+              style={{ touchAction: "none" }}
+            >
+              {product.image.map((img, index) => (
+                <div key={index} className="slide min-w-full h-full relative">
+                  <Image
+                    src={img}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
               ))}
             </div>
           </div>
