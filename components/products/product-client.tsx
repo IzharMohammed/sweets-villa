@@ -196,7 +196,7 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
         </div>
 
         {/* Add to Cart Button */}
-        <button className="w-full  bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-medium transition-colors duration-300 shadow-md hover:shadow-lg">
+        <button className="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-2.5 rounded-lg font-medium transition-colors duration-300 shadow-md hover:shadow-lg">
           Add to Cart
         </button>
       </div>
