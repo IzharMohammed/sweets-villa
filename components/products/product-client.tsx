@@ -95,7 +95,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
         {/* Title */}
         <h1
           ref={titleRef}
-          className="text-3xl sm:text-4xl lg:text-5xl text-center font-serif text-gray-800 mb-8 sm:mb-12"
+          className="text-3xl hidden  lg:block  lg:text-5xl text-center font-serif text-gray-800 mb-8 sm:mb-12"
         >
           The best sweets for every celebration—
           <br />

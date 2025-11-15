@@ -9,6 +9,7 @@ import { SplitText } from "gsap/all";
 import { motion, AnimatePresence } from "framer-motion";
 import { Home, ShoppingBag, ShoppingCart, User } from "lucide-react";
 import { Poppins } from "next/font/google";
+import { useRouter } from "next/navigation";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,6 +20,7 @@ export default function HeroSection() {
   const heroRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const descriptionRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("home");
@@ -130,17 +132,6 @@ export default function HeroSection() {
     };
   }, []);
 
-  const handleNavigation = (path: string) => {
-    // In a real Next.js app, you would use:
-    // import { useRouter } from 'next/navigation';
-    // const router = useRouter();
-    // router.push(path);
-
-    // For demo purposes, we'll just log
-    console.log(`Navigating to: ${path}`);
-    setActiveTab(path.replace("/", "") || "home");
-  };
-
   return (
     <>
       {/* Desktop Navbar - Hidden on mobile */}
@@ -198,13 +189,18 @@ export default function HeroSection() {
       </nav>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 w-full z-50 bg-slate-800/95 backdrop-blur-md border-t border-slate-700 pb-safe">
+      <nav
+        className="lg:hidden fixed bottom-3 left-1/2 -translate-x-1/2 
+                w-[92%] z-50 bg-yellow-200/90 
+                backdrop-blur-md rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.15)]
+                border border-yellow-300"
+      >
         <div className="flex items-center justify-around py-3 px-4">
           {/* Home */}
           <button
-            onClick={() => handleNavigation("/")}
+            onClick={() => router.push("/")}
             className={`flex flex-col items-center space-y-1 transition-colors ${
-              activeTab === "home" ? "text-teal-400" : "text-white/70"
+              activeTab === "home" ? "text-black" : "text-black/60"
             }`}
           >
             <Home className="w-6 h-6" />
@@ -213,9 +209,9 @@ export default function HeroSection() {
 
           {/* Products */}
           <button
-            onClick={() => handleNavigation("/products")}
+            onClick={() => router.push("/products")}
             className={`flex flex-col items-center space-y-1 transition-colors ${
-              activeTab === "products" ? "text-teal-400" : "text-white/70"
+              activeTab === "products" ? "text-black" : "text-black/60"
             }`}
           >
             <ShoppingBag className="w-6 h-6" />
@@ -224,13 +220,14 @@ export default function HeroSection() {
 
           {/* Cart */}
           <button
-            onClick={() => handleNavigation("/cart")}
+            onClick={() => router.push("/cart")}
             className={`flex flex-col items-center space-y-1 transition-colors relative ${
-              activeTab === "cart" ? "text-teal-400" : "text-white/70"
+              activeTab === "cart" ? "text-black" : "text-black/60"
             }`}
           >
             <ShoppingCart className="w-6 h-6" />
             <span className="text-xs">Cart</span>
+
             {/* Cart badge */}
             <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               0
@@ -239,9 +236,9 @@ export default function HeroSection() {
 
           {/* Profile */}
           <button
-            onClick={() => handleNavigation("/profile")}
+            onClick={() => router.push("/profile")}
             className={`flex flex-col items-center space-y-1 transition-colors ${
-              activeTab === "profile" ? "text-teal-400" : "text-white/70"
+              activeTab === "profile" ? "text-black" : "text-black/60"
             }`}
           >
             <User className="w-6 h-6" />
