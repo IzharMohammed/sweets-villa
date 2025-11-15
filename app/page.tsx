@@ -2,8 +2,12 @@ import Image from "next/image";
 import HeroSection from "../components/  HeroSection";
 import Navbar from "../components/Navbar";
 import Products from "../components/products/products";
+import { cookieManager } from "@/utils/authTools";
 
-export default function Home() {
+export default async function Home() {
+  const auth = await cookieManager.isAuthenticated();
+  console.log("auth", auth);
+
   return (
     <div>
       {/* <Navbar /> */}
