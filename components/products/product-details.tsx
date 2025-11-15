@@ -46,9 +46,6 @@ export default function ProductDetailClient({
   const [quantity, setQuantity] = useState(1);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
-
   // const mainImageRef = useRef(null);
   const slidesRef = useRef(null);
   const [slideIndex, setSlideIndex] = useState(0);
@@ -62,15 +59,6 @@ export default function ProductDetailClient({
   // Initial mount animation
   useGSAP(() => {
     const tl = gsap.timeline();
-
-    // // Animate thumbnails
-    // tl.from(".thumbnail-item", {
-    //   scale: 0.8,
-    //   opacity: 0,
-    //   duration: 0.5,
-    //   stagger: 0.08,
-    //   ease: "back.out(1.4)",
-    // });
 
     // Animate main image
     tl.from(
@@ -110,49 +98,6 @@ export default function ProductDetailClient({
       duration: 0.8,
       ease: "power3.inOut",
     });
-    // Slide current image out
-    // gsap.to(mainImageRef.current, {
-    //   x: -100 * direction + "%",
-    //   opacity: 0.3,
-    //   duration: 0.5,
-    //   ease: "power2.inOut",
-    // });
-
-    // // Update image after brief delay
-    // gsap.delayedCall(0.15, () => {
-    //   setSelectedImage(index);
-
-    //   //position and slide in new image
-    //   gsap.fromTo(
-    //     mainImageRef.current,
-    //     {
-    //       x: direction + "%",
-    //       // opacity: 0.3,
-    //     },
-    //     {
-    //       x: "0%",
-    //       opacity: 1,
-    //       duration: 2,
-    //       ease: "power2.out",
-    //     }
-    //   );
-    // });
-
-    // gsap.to(mainImageRef.current, {
-    //   opacity: 0,
-    //   scale: 0.98,
-    //   duration: 0.25,
-    //   ease: "power2.in",
-    //   onComplete: () => {
-    //     setSelectedImage(index);
-    //     gsap.to(mainImageRef.current, {
-    //       opacity: 1,
-    //       scale: 1,
-    //       duration: 0.25,
-    //       ease: "power2.out",
-    //     });
-    //   },
-    // });
   };
 
   // Handle variant selection
@@ -320,53 +265,6 @@ export default function ProductDetailClient({
           </div>
 
           {/* Main Image - Full Container with Swipe */}
-          {/* <div
-            ref={mainImageRef}
-            className="relative w-full h-full bg-gradient-to-br from-amber-50 to-orange-100"
-            onTouchStart={(e) => setTouchStart(e.targetTouches[0].clientX)}
-            onTouchMove={(e) => setTouchEnd(e.targetTouches[0].clientX)}
-            onTouchEnd={() => {
-              const swipeThreshold = 75;
-              const swipeDistance = touchStart - touchEnd;
-
-              if (Math.abs(swipeDistance) > swipeThreshold) {
-                if (swipeDistance > 0) {
-                  // Swipe left - next image
-                  const nextIndex = (selectedImage + 1) % product.image.length;
-                  handleImageSelect(nextIndex);
-                } else {
-                  // Swipe right - previous image
-                  const prevIndex =
-                    selectedImage === 0
-                      ? product.image.length - 1
-                      : selectedImage - 1;
-                  handleImageSelect(prevIndex);
-                }
-              }
-            }}
-          >
-            <Image
-              src={product.image[selectedImage]}
-              alt={product.name}
-              fill
-              className="object-cover"
-              priority
-            />
-
-            Dot Indicators - MOBILE ONLY 
-            <div className="lg:hidden absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
-              {product.image.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleImageSelect(index)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    selectedImage === index ? "bg-white w-6" : "bg-white/50"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>   */}
-
           <div
             ref={mainImageRef}
             className="relative w-full h-full overflow-hidden touch-pan-y"
@@ -387,6 +285,7 @@ export default function ProductDetailClient({
                 </div>
               ))}
             </div>
+
             {/* Mobile Indicators */}
             <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 md:hidden z-20">
               {product.image.map((_, idx) => (
