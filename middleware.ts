@@ -1,37 +1,57 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export async function middleware(req: NextRequest) {
-    const res = NextResponse.next();
+const GUEST_TOKEN_KEY = "guest_token";
+const AUTH_TOKEN_KEY = "auth_token";
+const USER_DATA_KEY = "user_data";
+const API_KEY = process.env.BACKEND_API_KEY || "";
+const BACKEND_URL = process.env.BACKEND_URL || "";
 
-    const guestToken = req.cookies.get("guest_token");
+export async function middleware(request: NextRequest) {
+    const response = NextResponse.next();
+
+    const guestToken = request.cookies.get(GUEST_TOKEN_KEY);
+    const hasAuthToken = request.cookies.get(AUTH_TOKEN_KEY);
+    const hasUserData = request.cookies.get(USER_DATA_KEY);
+    const isAuthenticated = Boolean(hasAuthToken || hasUserData);
+
+    // If authenticated, ensure guest token is removed and do not re-create it
+    if (isAuthenticated) {
+        if (guestToken) {
+            response.cookies.delete(GUEST_TOKEN_KEY);
+        }
+        return response;
+    }
 
     // If token doesn't exist → request a new one
     if (!guestToken) {
         try {
-            const apiRes = await fetch(`${process.env.BACKEND_URL}/auth/guest`, {
-                method: "POST",
+            const apiResponse = await fetch(`${BACKEND_URL}/v1/cart`, {
+                method: "GET",
                 headers: {
-                    "x-api-key": process.env.BACKEND_API_KEY!,
+                    "Content-Type": "application/json",
+                    "x-api-key": API_KEY,
                 },
+                cache: "no-store",
             });
 
-            const data = await apiRes.json();
-            const newToken = data.guestToken;
+            const newGuestToken = apiResponse.headers.get("x-guest-token");
 
-            res.cookies.set("guest_token", newToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "lax",
-                maxAge: 60 * 60 * 24 * 90,
-                path: "/",
-            });
+            if (newGuestToken) {
+                response.cookies.set(GUEST_TOKEN_KEY, newGuestToken, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: "lax",
+                    maxAge: 60 * 60 * 24 * 90, // 90 days
+                    path: "/",
+                });
+            }
         } catch (err) {
             console.error("Error creating guest token:", err);
         }
     }
 
-    return res;
+    return response;
 }
 
 // Apply to all routes except static files
