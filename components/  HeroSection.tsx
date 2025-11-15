@@ -24,7 +24,13 @@ export default function HeroSection() {
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("home");
+  const onPress = (el: any) => {
+    gsap.to(el, { scale: 0.85, duration: 0.15, ease: "power2.out" });
+  };
 
+  const onRelease = (el: any) => {
+    gsap.to(el, { scale: 1, duration: 0.3, ease: "elastic.out(1, 0.4)" });
+  };
   useGSAP(() => {
     // Initial entrance animations
     gsap.from(titleRef.current, {
@@ -189,147 +195,17 @@ export default function HeroSection() {
       </nav>
 
       {/* Mobile Bottom Navigation */}
-      {/* <nav
-        className="lg:hidden fixed bottom-3 left-1/2 -translate-x-1/2 
-                w-[92%] z-50 bg-yellow-200/90 
-                backdrop-blur-md rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.15)]
-                border border-yellow-300"
-      >
-        <div className="flex items-center justify-around py-3 px-4">
-         
-          <button
-            onClick={() => router.push("/")}
-            className={`flex flex-col items-center space-y-1 transition-colors ${
-              activeTab === "home" ? "text-black" : "text-black/60"
-            }`}
-          >
-            <Home className="w-6 h-6" />
-            <span className="text-xs">Home</span>
-          </button>
 
-        
-          <button
-            onClick={() => router.push("/products")}
-            className={`flex flex-col items-center space-y-1 transition-colors ${
-              activeTab === "products" ? "text-black" : "text-black/60"
-            }`}
-          >
-            <ShoppingBag className="w-6 h-6" />
-            <span className="text-xs">Products</span>
-          </button>
-
-        
-          <button
-            onClick={() => router.push("/cart")}
-            className={`flex flex-col items-center space-y-1 transition-colors relative ${
-              activeTab === "cart" ? "text-black" : "text-black/60"
-            }`}
-          >
-            <ShoppingCart className="w-6 h-6" />
-            <span className="text-xs">Cart</span>
-
-           
-            <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              0
-            </span>
-          </button>
-
-         
-          <button
-            onClick={() => router.push("/profile")}
-            className={`flex flex-col items-center space-y-1 transition-colors ${
-              activeTab === "profile" ? "text-black" : "text-black/60"
-            }`}
-          >
-            <User className="w-6 h-6" />
-            <span className="text-xs">Profile</span>
-          </button>
-        </div>
-      </nav> */}
-
-      {/* V2 */}
-
-      {/* <nav
-        className="
-    lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2
-    w-[90%] z-50
-    bg-white/15
-    backdrop-blur-xl
-    rounded-3xl
-    shadow-[0_8px_30px_rgba(0,0,0,0.12)]
-    border border-white/20
-    ring-1 ring-black/5
-  "
-      >
-        <div className="flex items-center justify-around py-3 px-4">
-      
-          <button
-            onClick={() => {}}
-            className={`flex flex-col items-center space-y-1 transition-colors ${
-              activeTab === "home" ? "text-black" : "text-black/60"
-            }`}
-          >
-            <Home className="w-6 h-6" />
-            <span className="text-[10px]">Home</span>
-          </button>
-
-     
-          <button
-            onClick={() => {}}
-            className={`flex flex-col items-center space-y-1 transition-colors ${
-              activeTab === "products" ? "text-black" : "text-black/60"
-            }`}
-          >
-            <ShoppingBag className="w-6 h-6" />
-            <span className="text-[10px]">Products</span>
-          </button>
-
-         
-          <button
-            onClick={() => {}}
-            className={`flex flex-col items-center space-y-1 transition-colors relative ${
-              activeTab === "cart" ? "text-black" : "text-black/60"
-            }`}
-          >
-            <ShoppingCart className="w-6 h-6" />
-            <span className="text-[10px]">Cart</span>
-
-          
-            <span
-              className="
-        absolute -top-1 -right-2 bg-red-500 text-white 
-        text-xs rounded-full w-5 h-5 flex items-center justify-center
-        shadow-md
-      "
-            >
-              0
-            </span>
-          </button>
-
-         
-          <button
-            onClick={() => {}}
-            className={`flex flex-col items-center space-y-1 transition-colors ${
-              activeTab === "profile" ? "text-black" : "text-black/60"
-            }`}
-          >
-            <User className="w-6 h-6" />
-            <span className="text-[10px]">Profile</span>
-          </button>
-        </div>
-      </nav> */}
-
-      {/* V3 */}
+      {/* V1 */}
       <nav
         className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 
             w-[90%] max-w-md z-50 
             bg-white/20 backdrop-blur-xl 
-            rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.12)]
+            rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12)]
             border border-white/30
             px-2 py-1"
       >
         <div className="flex items-center justify-around">
-          {/* Home */}
           <button
             onClick={() => {
               // router.push("/");
@@ -361,7 +237,6 @@ export default function HeroSection() {
             </span>
           </button>
 
-          {/* Products */}
           <button
             onClick={() => {
               // router.push("/products");
@@ -393,7 +268,6 @@ export default function HeroSection() {
             </span>
           </button>
 
-          {/* Cart */}
           <button
             onClick={() => {
               // router.push("/cart");
@@ -413,7 +287,6 @@ export default function HeroSection() {
                     : "text-gray-700"
                 }`}
               />
-              {/* Cart badge */}
               <span className="absolute top-0 right-2 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-sm">
                 0
               </span>
@@ -429,7 +302,6 @@ export default function HeroSection() {
             </span>
           </button>
 
-          {/* Profile */}
           <button
             onClick={() => {
               // router.push("/profile");
@@ -462,6 +334,132 @@ export default function HeroSection() {
           </button>
         </div>
       </nav>
+
+      {/* v2 */}
+      {/* <nav
+        className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 
+      w-[90%] max-w-md z-50 
+      bg-white/20 backdrop-blur-xl 
+      rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12)]
+      border border-white/30 px-2 py-1"
+      >
+        <div className="flex items-center justify-around">
+          <button
+            onClick={() => setActiveTab("home")}
+            onMouseDown={(e) => onPress(e.currentTarget)}
+            onMouseUp={(e) => onRelease(e.currentTarget)}
+            onTouchStart={(e) => onPress(e.currentTarget)}
+            onTouchEnd={(e) => onRelease(e.currentTarget)}
+            className="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl transition-all duration-200"
+          >
+            <div
+              className={`${
+                activeTab === "home" ? "scale-110" : "scale-100"
+              } transition-all`}
+            >
+              <Home
+                className={`w-6 h-6 ${
+                  activeTab === "home" ? "text-blue-600" : "text-gray-700"
+                }`}
+              />
+            </div>
+            <span
+              className={`text-[10px] font-medium ${
+                activeTab === "home" ? "text-blue-600" : "text-gray-700"
+              }`}
+            >
+              Home
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("products")}
+            onMouseDown={(e) => onPress(e.currentTarget)}
+            onMouseUp={(e) => onRelease(e.currentTarget)}
+            onTouchStart={(e) => onPress(e.currentTarget)}
+            onTouchEnd={(e) => onRelease(e.currentTarget)}
+            className="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl transition-all duration-200"
+          >
+            <div
+              className={`${
+                activeTab === "products" ? "scale-110" : "scale-100"
+              } transition-all`}
+            >
+              <ShoppingBag
+                className={`w-6 h-6 ${
+                  activeTab === "products" ? "text-blue-600" : "text-gray-700"
+                }`}
+              />
+            </div>
+            <span
+              className={`text-[10px] font-medium ${
+                activeTab === "products" ? "text-blue-600" : "text-gray-700"
+              }`}
+            >
+              Products
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("cart")}
+            onMouseDown={(e) => onPress(e.currentTarget)}
+            onMouseUp={(e) => onRelease(e.currentTarget)}
+            onTouchStart={(e) => onPress(e.currentTarget)}
+            onTouchEnd={(e) => onRelease(e.currentTarget)}
+            className="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl transition-all duration-200 relative"
+          >
+            <div
+              className={`${
+                activeTab === "cart" ? "scale-110" : "scale-100"
+              } transition-all`}
+            >
+              <ShoppingCart
+                className={`w-6 h-6 ${
+                  activeTab === "cart" ? "text-blue-600" : "text-gray-700"
+                }`}
+              />
+              <span className="absolute top-0 right-2 bg-red-500 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center">
+                0
+              </span>
+            </div>
+            <span
+              className={`text-[10px] font-medium ${
+                activeTab === "cart" ? "text-blue-600" : "text-gray-700"
+              }`}
+            >
+              Cart
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("profile")}
+            onMouseDown={(e) => onPress(e.currentTarget)}
+            onMouseUp={(e) => onRelease(e.currentTarget)}
+            onTouchStart={(e) => onPress(e.currentTarget)}
+            onTouchEnd={(e) => onRelease(e.currentTarget)}
+            className="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl transition-all duration-200"
+          >
+            <div
+              className={`${
+                activeTab === "profile" ? "scale-110" : "scale-100"
+              } transition-all`}
+            >
+              <User
+                className={`w-6 h-6 ${
+                  activeTab === "profile" ? "text-blue-600" : "text-gray-700"
+                }`}
+              />
+            </div>
+            <span
+              className={`text-[10px] font-medium ${
+                activeTab === "profile" ? "text-blue-600" : "text-gray-700"
+              }`}
+            >
+              Profile
+            </span>
+          </button>
+        </div>
+      </nav> */}
 
       {/* Mobile Top Navbar - Only visible on mobile */}
       <nav className="lg:hidden fixed top-0 left-0 w-full z-50 bg-slate-800/95 backdrop-blur-md border-b border-slate-700">
