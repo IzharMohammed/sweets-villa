@@ -21,19 +21,19 @@ export default function ProductsVertical({ products }: ProductsClientProps) {
 
   useGSAP(() => {
     // Animate category tabs
-    gsap.from(".category-tab", {
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top 80%",
-      },
-      y: 30,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.1,
-      ease: "power3.out",
-    });
+    // gsap.from(".category-tab", {
+    //   scrollTrigger: {
+    //     trigger: sectionRef.current,
+    //     start: "top 80%",
+    //   },
+    //   y: 30,
+    //   opacity: 0,
+    //   duration: 0.8,
+    //   stagger: 0.1,
+    //   ease: "power3.out",
+    // });
 
-    // Animate product cards on scroll
+    // // Animate product cards on scroll
     gsap.from(".product-card-vertical", {
       scrollTrigger: {
         trigger: ".products-grid",
@@ -87,22 +87,6 @@ function ProductCardVertical({
   const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
 
-  useGSAP(() => {
-    if (isHovered) {
-      gsap.to(cardRef.current, {
-        y: -8,
-        duration: 0.3,
-        ease: "power2.out",
-      });
-    } else {
-      gsap.to(cardRef.current, {
-        y: 0,
-        duration: 0.3,
-        ease: "power2.out",
-      });
-    }
-  }, [isHovered]);
-
   const lowestPrice = Math.min(...product.variants.map((v) => v.price));
   const hasDiscount = product.variants.some((v) => v.discount > 0);
 
@@ -115,7 +99,7 @@ function ProductCardVertical({
       onClick={() => router.push(`/products/${product.id}`)}
     >
       {/* Image Container */}
-      <div className="relative aspect-square bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl overflow-hidden mb-3 shadow-lg">
+      <div className="relative aspect-square bg-linear-to-br from-amber-100 to-orange-100 rounded-2xl overflow-hidden mb-3 shadow-lg">
         <Image
           src={product.image[0]}
           alt={product.name}
@@ -151,8 +135,22 @@ function ProductCardVertical({
         </div>
 
         {/* Add to Cart Button */}
-        <button className="w-full mt-2 bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded-lg text-sm font-medium transition-colors duration-300 shadow-md hover:shadow-lg">
-          Add
+        <button
+          className="
+    group w-full mt-2 relative overflow-hidden
+    bg-yellow-600 text-white py-2 rounded-lg text-sm font-medium
+    shadow-md transition-all duration-300
+  "
+        >
+          <span
+            className="
+      absolute inset-0 bg-yellow-700 
+      translate-y-full group-hover:translate-y-0
+      transition-transform duration-300
+    "
+          ></span>
+
+          <span className="relative z-10">Add</span>
         </button>
       </div>
     </div>
