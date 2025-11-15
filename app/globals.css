@@ -39,3 +39,11 @@ body {
 .indicator-dot {
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
