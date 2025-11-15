@@ -6,10 +6,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { SplitText } from "gsap/all";
-import { motion, AnimatePresence } from "framer-motion";
-import { Home, ShoppingBag, ShoppingCart, User } from "lucide-react";
 import { Poppins } from "next/font/google";
-import { useRouter } from "next/navigation";
 import BottomNav from "./bottom-nav";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -20,18 +17,7 @@ export default function HeroSection() {
   const navTitleRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
-  const descriptionRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>("home");
-  const onPress = (el: any) => {
-    gsap.to(el, { scale: 0.85, duration: 0.15, ease: "power2.out" });
-  };
-
-  const onRelease = (el: any) => {
-    gsap.to(el, { scale: 1, duration: 0.3, ease: "elastic.out(1, 0.4)" });
-  };
   useGSAP(() => {
     // Initial entrance animations
     gsap.from(titleRef.current, {
