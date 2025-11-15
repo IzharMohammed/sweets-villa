@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { AUTH_TOKEN_KEY, GUEST_TOKEN_KEY, USER_DATA_KEY } from "./constants";
 
-const GUEST_TOKEN_KEY = "guest_token";
-const AUTH_TOKEN_KEY = "auth_token";
-const USER_DATA_KEY = "user_data";
+
 const API_KEY = process.env.BACKEND_API_KEY || "";
 const BACKEND_URL = process.env.BACKEND_URL || "";
 
@@ -16,7 +15,7 @@ export async function middleware(request: NextRequest) {
 
     const isAuthenticated = Boolean(hasAuthToken && hasUserData);
     console.log(isAuthenticated);
-    
+
     // ========================================
     // CASE 1: User is authenticated
     // ========================================
