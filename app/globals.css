@@ -35,3 +35,7 @@ body {
   background-clip: text;
   color: transparent;
 }
+
+.indicator-dot {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}

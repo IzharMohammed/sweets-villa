@@ -215,6 +215,8 @@ export default function ProductDetailClient({
       duration: 0.5,
       ease: "power2.out",
     });
+
+    animateIndicator(index);
   };
 
   // Detect swipe start
@@ -269,6 +271,21 @@ export default function ProductDetailClient({
       slider.removeEventListener("mouseleave", handleTouchEnd);
     };
   }, [slideIndex]);
+
+  const animateIndicator = (index: number) => {
+    gsap.to(".indicator-dot", {
+      scale: 0.6,
+      opacity: 0.4,
+      duration: 0.3,
+    });
+
+    gsap.to(`.indicator-dot-${index}`, {
+      scale: 1,
+      opacity: 1,
+      duration: 0.4,
+      ease: "power2.out",
+    });
+  };
 
   const totalPrice = selectedVariant.price * quantity;
   console.log(product);
@@ -368,6 +385,19 @@ export default function ProductDetailClient({
                     className="object-cover"
                   />
                 </div>
+              ))}
+            </div>
+            {/* Mobile Indicators */}
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 md:hidden z-20">
+              {product.image.map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`indicator-dot indicator-dot-${idx} w-2 h-2 rounded-full bg-white/80`}
+                  style={{
+                    transform: slideIndex === idx ? "scale(1)" : "scale(0.6)",
+                    opacity: slideIndex === idx ? 1 : 0.4,
+                  }}
+                />
               ))}
             </div>
           </div>
