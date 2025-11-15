@@ -7,6 +7,7 @@ import { useGSAP } from "@gsap/react";
 import Image from "next/image";
 import { Product, ProductsClientProps } from "@/types/product";
 import { useRouter } from "next/navigation";
+import BottomNav from "../bottom-nav";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -72,6 +73,7 @@ export default function ProductsVertical({ products }: ProductsClientProps) {
           ))}
         </div>
       </div>
+      <BottomNav />
     </section>
   );
 }

@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Home, ShoppingBag, ShoppingCart, User } from "lucide-react";
 import { Poppins } from "next/font/google";
 import { useRouter } from "next/navigation";
+import BottomNav from "./bottom-nav";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -197,143 +198,7 @@ export default function HeroSection() {
       {/* Mobile Bottom Navigation */}
 
       {/* V1 */}
-      <nav
-        className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 
-            w-[90%] max-w-md z-50 
-            bg-white/20 backdrop-blur-xl 
-            rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12)]
-            border border-white/30
-            px-2 py-1"
-      >
-        <div className="flex items-center justify-around">
-          <button
-            onClick={() => {
-              // router.push("/");
-              setActiveTab("home");
-            }}
-            className="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl transition-all duration-200"
-          >
-            <div
-              className={`transition-all duration-200 ${
-                activeTab === "home" ? "scale-110" : "scale-100"
-              }`}
-            >
-              <Home
-                className={`w-6 h-6 transition-all duration-200 ${
-                  activeTab === "home"
-                    ? "text-blue-600 fill-blue-600"
-                    : "text-gray-700"
-                }`}
-              />
-            </div>
-            <span
-              className={`text-[10px] font-medium transition-all duration-200 ${
-                activeTab === "home"
-                  ? "text-blue-600 scale-95"
-                  : "text-gray-700"
-              }`}
-            >
-              Home
-            </span>
-          </button>
-
-          <button
-            onClick={() => {
-              router.push("/products");
-              setActiveTab("products");
-            }}
-            className="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl transition-all duration-200"
-          >
-            <div
-              className={`transition-all duration-200 ${
-                activeTab === "products" ? "scale-110" : "scale-100"
-              }`}
-            >
-              <ShoppingBag
-                className={`w-6 h-6 transition-all duration-200 ${
-                  activeTab === "products"
-                    ? "text-blue-600 fill-blue-600"
-                    : "text-gray-700"
-                }`}
-              />
-            </div>
-            <span
-              className={`text-[10px] font-medium transition-all duration-200 ${
-                activeTab === "products"
-                  ? "text-blue-600 scale-95"
-                  : "text-gray-700"
-              }`}
-            >
-              Products
-            </span>
-          </button>
-
-          <button
-            onClick={() => {
-              // router.push("/cart");
-              setActiveTab("cart");
-            }}
-            className="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl transition-all duration-200 relative"
-          >
-            <div
-              className={`transition-all duration-200 ${
-                activeTab === "cart" ? "scale-110" : "scale-100"
-              }`}
-            >
-              <ShoppingCart
-                className={`w-6 h-6 transition-all duration-200 ${
-                  activeTab === "cart"
-                    ? "text-blue-600 fill-blue-600"
-                    : "text-gray-700"
-                }`}
-              />
-              <span className="absolute top-0 right-2 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-sm">
-                0
-              </span>
-            </div>
-            <span
-              className={`text-[10px] font-medium transition-all duration-200 ${
-                activeTab === "cart"
-                  ? "text-blue-600 scale-95"
-                  : "text-gray-700"
-              }`}
-            >
-              Cart
-            </span>
-          </button>
-
-          <button
-            onClick={() => {
-              // router.push("/profile");
-              setActiveTab("profile");
-            }}
-            className="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl transition-all duration-200"
-          >
-            <div
-              className={`transition-all duration-200 ${
-                activeTab === "profile" ? "scale-110" : "scale-100"
-              }`}
-            >
-              <User
-                className={`w-6 h-6 transition-all duration-200 ${
-                  activeTab === "profile"
-                    ? "text-blue-600 fill-blue-600"
-                    : "text-gray-700"
-                }`}
-              />
-            </div>
-            <span
-              className={`text-[10px] font-medium transition-all duration-200 ${
-                activeTab === "profile"
-                  ? "text-blue-600 scale-95"
-                  : "text-gray-700"
-              }`}
-            >
-              Profile
-            </span>
-          </button>
-        </div>
-      </nav>
+      <BottomNav />
 
       {/* v2 */}
       {/* <nav
