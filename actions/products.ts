@@ -3,6 +3,7 @@
 const API_KEY = process.env.BACKEND_API_KEY || "";
 const BACKEND_URL = process.env.BACKEND_URL || "";
 
+
 export async function getProducts(filters = {}) {
     try {
         // // Build headers with auth or guest token
@@ -84,6 +85,8 @@ export async function getProductDetails(productId: string) {
                 tags: ["products"],
             },
         });
+
+        console.log("response", response);
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));

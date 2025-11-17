@@ -5,26 +5,7 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import Image from "next/image";
 import { geist, lato, libre, montserrat, ubuntu } from "@/lib/fonts";
-
-interface Variant {
-  id: string;
-  discount: number;
-  price: number;
-  stock: number;
-  unit: string;
-  quantity: number;
-  position: number;
-  isDefault: boolean;
-}
-
-interface Product {
-  id: string;
-  category: string;
-  name: string;
-  description: string;
-  image: string[];
-  variants: Variant[];
-}
+import { Product, Variant } from "@/app/products/[slug]/page";
 
 interface ProductDetailClientProps {
   product: Product;
