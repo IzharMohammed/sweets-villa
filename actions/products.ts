@@ -22,8 +22,6 @@ export async function getProducts(filters = {}) {
             "x-api-key": process.env.BACKEND_API_KEY || "",
         };
 
-
-
         const queryString = queryParams.toString();
         const url = `${BACKEND_URL}/v1/products${queryString ? `?${queryString}` : ""
             }`;
@@ -52,8 +50,6 @@ export async function getProducts(filters = {}) {
         }
 
         const data = await response.json();
-
-        console.log("data from products", data);
 
         return {
             ...data,
@@ -88,8 +84,6 @@ export async function getProductDetails(productId: string) {
                 tags: ["products"],
             },
         });
-
-        console.log("product details", response);
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));

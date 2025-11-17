@@ -8,6 +8,8 @@ import Image from "next/image";
 import { Product, ProductsClientProps } from "@/types/product";
 import { useRouter } from "next/navigation";
 import BottomNav from "../bottom-nav";
+import { addToCart } from "@/actions/cart";
+import { toast } from "sonner";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -87,10 +89,46 @@ function ProductCardVertical({
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
   const router = useRouter();
 
   const lowestPrice = Math.min(...product.variants.map((v) => v.price));
   const hasDiscount = product.variants.some((v) => v.discount > 0);
+
+  // Handle add to cart
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent navigation to product page
+
+    if (isAdding) return; // Prevent double clicks
+
+    setIsAdding(true);
+
+    try {
+      console.log(product.id);
+
+      const result = await addToCart(product.id, 1);
+
+      if (result.success) {
+        toast.success(result.message || "Item added to cart!");
+
+        // Optional: Add a quick scale animation
+        gsap.to(cardRef.current, {
+          scale: 0.95,
+          duration: 0.1,
+          yoyo: true,
+          repeat: 1,
+          ease: "power2.inOut",
+        });
+      } else {
+        toast.error(result.message || "Failed to add item to cart");
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsAdding(false);
+    }
+  };
 
   return (
     <div
@@ -101,7 +139,7 @@ function ProductCardVertical({
       onClick={() => router.push(`/products/${product.id}`)}
     >
       {/* Image Container */}
-      <div className="relative aspect-square bg-linear-to-br from-amber-100 to-orange-100 rounded-2xl overflow-hidden mb-3 shadow-lg">
+      <div className="relative aspect-square bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl overflow-hidden mb-3 shadow-lg">
         <Image
           src={product.image[0]}
           alt={product.name}
@@ -138,21 +176,25 @@ function ProductCardVertical({
 
         {/* Add to Cart Button */}
         <button
+          onClick={handleAddToCart}
+          disabled={isAdding}
           className="
-    group w-full mt-2 relative overflow-hidden
-    bg-yellow-600 text-white py-2 rounded-lg text-sm font-medium
-    shadow-md transition-all duration-300
-  "
+            group w-full mt-2 relative overflow-hidden
+            bg-yellow-600 text-white py-2 rounded-lg text-sm font-medium
+            shadow-md transition-all duration-300
+            disabled:opacity-50 disabled:cursor-not-allowed
+          "
         >
           <span
             className="
-      absolute inset-0 bg-yellow-700 
-      translate-y-full group-hover:translate-y-0
-      transition-transform duration-300
-    "
+              absolute inset-0 bg-yellow-700 
+              translate-y-full group-hover:translate-y-0
+              transition-transform duration-300
+            "
           ></span>
-
-          <span className="relative z-10">Add</span>
+          <span className="relative z-10">
+            {isAdding ? "Adding..." : "Add"}
+          </span>
         </button>
       </div>
     </div>

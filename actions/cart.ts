@@ -77,6 +77,7 @@ export async function addToCart(productId: string, quantity: number) {
 
     try {
         const headers = await cookieManager.buildApiHeaders();
+        console.log("productId", productId);
 
         const response = await fetch(`${BACKEND_URL}/v1/cart`, {
             method: "POST",
@@ -86,6 +87,7 @@ export async function addToCart(productId: string, quantity: number) {
                 tags: ["cart"],
             },
         });
+        console.log("response from cart", response);
 
         // await cookieManager.handleApiResponse(response);
 
@@ -100,7 +102,7 @@ export async function addToCart(productId: string, quantity: number) {
             message: "Item added to cart successfully...!!!",
         };
     } catch (error) {
-        console.error("Error fetching cart:", error);
+        console.error("Error adding to cart:", error);
         throw error;
     }
 }
