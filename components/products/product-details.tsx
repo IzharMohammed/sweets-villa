@@ -6,6 +6,8 @@ import { useGSAP } from "@gsap/react";
 import Image from "next/image";
 import { geist, lato, libre, montserrat, ubuntu } from "@/lib/fonts";
 import { Product, Variant } from "@/app/products/[slug]/page";
+import { addToCart } from "@/actions/cart";
+import { toast } from "sonner";
 
 interface ProductDetailClientProps {
   product: Product;
@@ -36,6 +38,33 @@ export default function ProductDetailClient({
   const isDragging = useRef(false);
 
   const slideCount = product.image.length;
+  const [isAdding, setIsAdding] = useState(false);
+
+  // Handle add to cart
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent navigation to product page
+
+    if (isAdding) return; // Prevent double clicks
+
+    setIsAdding(true);
+
+    try {
+      console.log(product.id);
+
+      const result = await addToCart(product.id, selectedVariant.id, 1);
+
+      if (result.success) {
+        toast.success(result.message || "Item added to cart!");
+      } else {
+        toast.error(result.message || "Failed to add item to cart");
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsAdding(false);
+    }
+  };
 
   // Initial mount animation
   useGSAP(() => {

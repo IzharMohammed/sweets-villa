@@ -46,7 +46,7 @@ export async function getCartItems() {
     }
 }
 
-export async function addToCart(productId: string, quantity: number) {
+export async function addToCart(productId: string, variantId: string, quantity: number) {
     // Check if environment variables are set
     if (!API_KEY || !BACKEND_URL) {
         console.error(
@@ -82,7 +82,7 @@ export async function addToCart(productId: string, quantity: number) {
         const response = await fetch(`${BACKEND_URL}/v1/cart`, {
             method: "POST",
             headers,
-            body: JSON.stringify({ productId, quantity }),
+            body: JSON.stringify({ productId, variantId, quantity }),
             next: {
                 tags: ["cart"],
             },

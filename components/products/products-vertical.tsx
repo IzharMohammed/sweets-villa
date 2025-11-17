@@ -97,37 +97,31 @@ function ProductCardVertical({
 
   // Handle add to cart
   const handleAddToCart = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent navigation to product page
-
-    if (isAdding) return; // Prevent double clicks
-
-    setIsAdding(true);
-
-    try {
-      console.log(product.id);
-
-      const result = await addToCart(product.id, 1);
-
-      if (result.success) {
-        toast.success(result.message || "Item added to cart!");
-
-        // Optional: Add a quick scale animation
-        gsap.to(cardRef.current, {
-          scale: 0.95,
-          duration: 0.1,
-          yoyo: true,
-          repeat: 1,
-          ease: "power2.inOut",
-        });
-      } else {
-        toast.error(result.message || "Failed to add item to cart");
-      }
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setIsAdding(false);
-    }
+    // e.stopPropagation(); // Prevent navigation to product page
+    // if (isAdding) return; // Prevent double clicks
+    // setIsAdding(true);
+    // try {
+    //   console.log(product.id);
+    //   const result = await addToCart(product.id, 1);
+    //   if (result.success) {
+    //     toast.success(result.message || "Item added to cart!");
+    //     // Optional: Add a quick scale animation
+    //     gsap.to(cardRef.current, {
+    //       scale: 0.95,
+    //       duration: 0.1,
+    //       yoyo: true,
+    //       repeat: 1,
+    //       ease: "power2.inOut",
+    //     });
+    //   } else {
+    //     toast.error(result.message || "Failed to add item to cart");
+    //   }
+    // } catch (error) {
+    //   console.error("Error adding to cart:", error);
+    //   toast.error("Something went wrong. Please try again.");
+    // } finally {
+    //   setIsAdding(false);
+    // }
   };
 
   return (
