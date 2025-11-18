@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
     const hasUserData = request.cookies.get(USER_DATA_KEY);
 
     const isAuthenticated = Boolean(hasAuthToken && hasUserData);
-    console.log(isAuthenticated);
+    console.log("isAuthenticated", isAuthenticated);
 
     // ========================================
     // CASE 1: User is authenticated

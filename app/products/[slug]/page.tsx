@@ -44,6 +44,5 @@ export default async function ProductDetailsPage({
 }) {
   const { slug } = await params;
   const product = (await getProductDetails(slug)) as ProductResponse;
-  console.log(product);
   return <ProductDetailClient product={product.data} />;
 }

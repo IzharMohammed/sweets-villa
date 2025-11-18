@@ -77,7 +77,6 @@ export async function addToCart(productId: string, variantId: string, quantity: 
 
     try {
         const headers = await cookieManager.buildApiHeaders();
-        console.log("productId", productId);
 
         const response = await fetch(`${BACKEND_URL}/v1/cart`, {
             method: "POST",

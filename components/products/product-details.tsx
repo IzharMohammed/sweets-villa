@@ -5,9 +5,28 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import Image from "next/image";
 import { geist, lato, libre, montserrat, ubuntu } from "@/lib/fonts";
-import { Product, Variant } from "@/app/products/[slug]/page";
 import { addToCart } from "@/actions/cart";
 import { toast } from "sonner";
+
+interface Variant {
+  id: string;
+  discount: number;
+  price: number;
+  stock: number;
+  unit: string;
+  quantity: number;
+  position: number;
+  isDefault: boolean;
+}
+
+interface Product {
+  id: string;
+  category: string;
+  name: string;
+  description: string;
+  image: string[];
+  variants: Variant[];
+}
 
 interface ProductDetailClientProps {
   product: Product;
@@ -49,7 +68,6 @@ export default function ProductDetailClient({
     setIsAdding(true);
 
     try {
-      console.log(product.id);
 
       const result = await addToCart(product.id, selectedVariant.id, 1);
 
@@ -243,7 +261,6 @@ export default function ProductDetailClient({
   };
 
   const totalPrice = selectedVariant.price * quantity;
-  console.log(product);
 
   return (
     <div className="min-h-screen bg-white">

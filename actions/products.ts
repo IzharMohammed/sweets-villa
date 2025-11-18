@@ -35,7 +35,6 @@ export async function getProducts(filters = {}) {
                 tags: ["products"],
             },
         });
-        console.log(response);
 
         // Store guest token if returned
         // await cookieManager.handleApiResponse(response);
@@ -86,7 +85,6 @@ export async function getProductDetails(productId: string) {
             },
         });
 
-        console.log("response", response);
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
