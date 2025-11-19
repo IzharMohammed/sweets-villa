@@ -1,5 +1,13 @@
 "use client";
 
+
+
+/**
+ * 
+ * d73ea05e-5c09-4424-9510-7410f763b798
+ */
+
+
 import Image from "next/image";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { useEffect, useState } from "react";
