@@ -68,7 +68,6 @@ export default function ProductDetailClient({
     setIsAdding(true);
 
     try {
-
       const result = await addToCart(product.id, selectedVariant.id, 1);
 
       if (result.success) {
@@ -434,6 +433,7 @@ export default function ProductDetailClient({
 
           {/* Add to Cart Button */}
           <button
+            onClick={handleAddToCart}
             className={`w-full bg-gray-800 text-white py-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors mb-3 text-sm uppercase tracking-wide ${montserrat.className}`}
           >
             ADD TO CART — ₹{totalPrice}

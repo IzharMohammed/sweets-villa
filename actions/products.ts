@@ -50,7 +50,7 @@ export async function getProducts(filters = {}) {
         }
 
         const data = await response.json();
-
+        
         return {
             ...data,
             // guestToken: response.headers.get(GUEST_TOKEN_KEY),
