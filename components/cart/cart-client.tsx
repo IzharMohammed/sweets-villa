@@ -259,7 +259,7 @@ export default function CartClient({ cart }: { cart: CartData }) {
               <button className="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-3 rounded-xl font-medium transition-colors shadow-md hover:shadow-lg">
                 Proceed to Checkout
               </button>
-
+            
               <button
                 onClick={() => router.push("/products")}
                 className="w-full mt-3 border-2 border-gray-300 hover:border-gray-400 text-gray-700 py-3 rounded-xl font-medium transition-colors"
