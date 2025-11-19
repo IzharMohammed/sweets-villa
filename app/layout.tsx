@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "../components/lenis";
 import { Toaster } from "@/components/ui/sonner";
+import { useInitGuestToken } from "@/lib/hooks/useInitGuestToken";
+import { Providers } from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +31,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SmoothScroll>{children}</SmoothScroll> <Toaster richColors />
+        <SmoothScroll>
+          <Providers>{children}</Providers>
+        </SmoothScroll>{" "}
+        <Toaster richColors />
       </body>
     </html>
   );
