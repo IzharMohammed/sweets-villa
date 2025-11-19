@@ -1,5 +1,7 @@
 "use server";
 
+import { cookieManager } from "@/utils/authTools";
+
 const API_KEY = process.env.BACKEND_API_KEY || "";
 const BACKEND_URL = process.env.BACKEND_URL || "";
 
@@ -7,7 +9,7 @@ const BACKEND_URL = process.env.BACKEND_URL || "";
 export async function getProducts(filters = {}) {
     try {
         // // Build headers with auth or guest token
-        // const headers = await cookieManager.buildApiHeaders();
+        const headers = await cookieManager.buildApiHeaders();
 
         // Build query string from filters
         const queryParams = new URLSearchParams();
@@ -18,10 +20,6 @@ export async function getProducts(filters = {}) {
                 queryParams.append(key, value.toString());
             }
         });
-        const headers = {
-            "Content-Type": "application/json",
-            "x-api-key": process.env.BACKEND_API_KEY || "",
-        };
 
         const queryString = queryParams.toString();
         const url = `${BACKEND_URL}/v1/products${queryString ? `?${queryString}` : ""
@@ -50,7 +48,7 @@ export async function getProducts(filters = {}) {
         }
 
         const data = await response.json();
-        
+
         return {
             ...data,
             // guestToken: response.headers.get(GUEST_TOKEN_KEY),
@@ -66,15 +64,7 @@ export async function getProducts(filters = {}) {
 
 export async function getProductDetails(productId: string) {
     try {
-        const headers = {
-            "Content-Type": "application/json",
-            "x-api-key": API_KEY,
-        };
-
-        // Add custom headers if user is authenticated
-        // if (userData) {
-        //     headers["x-user-id"] = userData.id;
-        // }
+        const headers = await cookieManager.buildApiHeaders();
 
         const response = await fetch(`${BACKEND_URL}/v1/products/${productId}`, {
             method: "GET",

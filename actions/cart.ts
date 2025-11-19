@@ -25,6 +25,7 @@ export async function getCartItems() {
                 tags: ["cart"],
             },
         });
+        console.log("request going from cart actions");
 
         // Store guest token from response
         // await cookieManager.handleApiResponse(response);
