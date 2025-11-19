@@ -48,6 +48,8 @@ export async function sendOtp(phoneNumber: string) {
         }
 
         const data = await response.json();
+        console.log("data from send-otp", data);
+
         return {
             success: true,
             message: data.message || "OTP sent successfully",
@@ -120,6 +122,47 @@ export async function verifyOtp(
         }
 
         const data = await response.json();
+        console.log("data from verify-otp", data);
+
+        // Get guest token before clearing it
+        const guestToken = await cookieManager.getGuestToken();
+
+        // Set authenticated user cookies
+        // await cookieManager.setAuthenticatedUser(data);
+
+        // Merge guest data if guest token exists
+        if (guestToken) {
+            try {
+                const mergeResponse = await fetch(
+                    `${BACKEND_URL}/v1/auth/merge-guest-data`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "x-api-key": API_KEY,
+                            "x-customer-id": data.user.id,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ guestToken }),
+                    }
+                );
+
+                if (mergeResponse.ok) {
+                    const mergeData = await mergeResponse.json();
+                    console.log("Guest data merged successfully:", mergeData);
+                } else {
+                    console.error(
+                        "Failed to merge guest data:",
+                        await mergeResponse.text()
+                    );
+                }
+
+                console.log("Guest data merged successfully");
+            } catch (error) {
+                console.error("Failed to merge guest data:", error);
+                // Don't fail signup if merge fails
+            }
+        }
+
 
         // If verification successful and not disabling session, handle user data
         if (data.success && data.user && !disableSession) {
