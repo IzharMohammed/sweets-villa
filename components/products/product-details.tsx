@@ -7,6 +7,7 @@ import Image from "next/image";
 import { geist, lato, libre, montserrat, ubuntu } from "@/lib/fonts";
 import { addToCart } from "@/actions/cart";
 import { toast } from "sonner";
+import { useCartStore } from "@/store/cart-store";
 
 interface Variant {
   id: string;
@@ -59,6 +60,8 @@ export default function ProductDetailClient({
   const slideCount = product.image.length;
   const [isAdding, setIsAdding] = useState(false);
 
+  const increment = useCartStore((s) => s.increment);
+
   // Handle add to cart
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent navigation to product page
@@ -72,6 +75,7 @@ export default function ProductDetailClient({
 
       if (result.success) {
         toast.success(result.message || "Item added to cart!");
+        increment();
       } else {
         toast.error(result.message || "Failed to add item to cart");
       }

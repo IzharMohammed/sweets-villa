@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import BottomNav from "@/components/bottom-nav";
+import { useCartStore } from "@/store/cart-store";
 
 interface Variant {
   id: string;
@@ -52,7 +53,10 @@ interface CartData {
 export default function CartClient({ cart }: { cart: CartData }) {
   const router = useRouter();
   const [items, setItems] = useState(cart.data);
-
+  const setCount = useCartStore((s) => s.setCount);
+  useEffect(() => {
+    setCount(cart.count);
+  }, [cart.count, setCount]);
   // Handle quantity change
   const updateQuantity = (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return;

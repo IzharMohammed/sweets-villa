@@ -1,11 +1,14 @@
 "use client";
 
+import { getCartItems } from "@/actions/cart";
+import { useCartStore } from "@/store/cart-store";
 import { Home, ShoppingBag, ShoppingCart, User } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
 export default function BottomNav() {
   const router = useRouter();
   const pathname = usePathname();
+  const cartCount = useCartStore((s) => s.count);
 
   // Determine active tab based on current route
   const getActiveTab = () => {
@@ -15,7 +18,6 @@ export default function BottomNav() {
     if (pathname.startsWith("/profile")) return "profile";
     return "home";
   };
-
   const activeTab = getActiveTab();
 
   return (
@@ -98,7 +100,7 @@ export default function BottomNav() {
               }`}
             />
             <span className="absolute top-0 right-2 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-sm">
-              0
+              {cartCount}
             </span>
           </div>
           <span
