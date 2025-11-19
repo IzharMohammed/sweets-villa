@@ -1,12 +1,9 @@
 "use client";
 
-
-
 /**
- * 
+ *
  * d73ea05e-5c09-4424-9510-7410f763b798
  */
-
 
 import Image from "next/image";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
@@ -14,6 +11,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import BottomNav from "@/components/bottom-nav";
 import { useCartStore } from "@/store/cart-store";
+import OTPDrawer from "../otp-drawer";
 
 interface Variant {
   id: string;
@@ -114,6 +112,13 @@ export default function CartClient({ cart }: { cart: CartData }) {
       </>
     );
   }
+
+  // Handle successful login
+  const handleLoginSuccess = () => {
+    // Redirect to checkout or show success message
+    console.log("Login successful, proceeding to checkout...");
+    router.push("/checkout");
+  };
 
   return (
     <>
@@ -256,10 +261,8 @@ export default function CartClient({ cart }: { cart: CartData }) {
                 </div>
               </div>
 
-              <button className="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-3 rounded-xl font-medium transition-colors shadow-md hover:shadow-lg">
-                Proceed to Checkout
-              </button>
-            
+              <OTPDrawer onLoginSuccess={handleLoginSuccess} />
+
               <button
                 onClick={() => router.push("/products")}
                 className="w-full mt-3 border-2 border-gray-300 hover:border-gray-400 text-gray-700 py-3 rounded-xl font-medium transition-colors"

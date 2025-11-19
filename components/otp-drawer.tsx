@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 interface OTPDrawerProps {
   onLoginSuccess?: () => void;
@@ -64,12 +65,6 @@ export default function OTPDrawer({ onLoginSuccess }: OTPDrawerProps) {
 
     try {
       // TODO: Call your API to verify OTP and login
-      // const result = await verifyOTP(phoneNumber, otp);
-
-      console.log("Verifying OTP:", { phoneNumber, otp });
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Close both drawers
       setOtpOpen(false);
