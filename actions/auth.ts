@@ -1,6 +1,6 @@
 "use server";
 
-import { cookieManager } from "@/utils/authTools";
+import { CookieManager, cookieManager } from "@/utils/authTools";
 import { revalidateTag } from "next/cache";
 
 const API_KEY = process.env.BACKEND_API_KEY || "";
@@ -25,12 +25,11 @@ export async function sendOtp(phoneNumber: string) {
             };
         }
 
+        const headers = await cookieManager.buildApiHeaders();
+
         const response = await fetch(`${BACKEND_URL}/v1/auth/phone-number/send-otp`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-api-key": API_KEY,
-            },
+            headers,
             body: JSON.stringify({
                 phoneNumber
             }),
@@ -96,12 +95,11 @@ export async function verifyOtp(
             };
         }
 
+        const headers = await cookieManager.buildApiHeaders();
+
         const response = await fetch(`${BACKEND_URL}/v1/auth/phone-number/verify`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-api-key": API_KEY,
-            },
+            headers,
             body: JSON.stringify({
                 phoneNumber,
                 code,
@@ -111,6 +109,8 @@ export async function verifyOtp(
             cache: "no-store",
         });
 
+        const data = await response.json();
+        console.log("data from verify-otp", data);
         console.log("OTP verification request completed");
 
         if (!response.ok) {
@@ -121,11 +121,11 @@ export async function verifyOtp(
             };
         }
 
-        const data = await response.json();
-        console.log("data from verify-otp", data);
+
 
         // Get guest token before clearing it
         const guestToken = await cookieManager.getGuestToken();
+        console.log("guestToken", guestToken);
 
         // Set authenticated user cookies
         // await cookieManager.setAuthenticatedUser(data);

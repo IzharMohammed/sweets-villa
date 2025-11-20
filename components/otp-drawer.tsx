@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { sendOtp, verifyOtp } from "@/actions/auth";
 
 interface OTPDrawerProps {
   onLoginSuccess?: () => void;
@@ -37,8 +38,9 @@ export default function OTPDrawer({ onLoginSuccess }: OTPDrawerProps) {
     setIsLoading(true);
 
     try {
-      // TODO: Call your API to send OTP
-      // await sendOTP(phoneNumber);
+      //  Call  API to send OTP
+      const result = await sendOtp(phoneNumber);
+      console.log("result", result);
 
       console.log("Sending OTP to:", phoneNumber);
 
@@ -65,7 +67,7 @@ export default function OTPDrawer({ onLoginSuccess }: OTPDrawerProps) {
 
     try {
       // TODO: Call your API to verify OTP and login
-
+      await verifyOtp(phoneNumber, otp);
       // Close both drawers
       setOtpOpen(false);
       setParentOpen(false);
