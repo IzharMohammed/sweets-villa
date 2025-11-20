@@ -167,6 +167,8 @@ export async function verifyOtp(
         // If verification successful and not disabling session, handle user data
         if (data.success && data.user && !disableSession) {
             // Store user data if needed
+            console.log("data inside if", data);
+
             if (data.user.id) {
                 await cookieManager.setAuthenticatedUser({
                     token: data.token || "",

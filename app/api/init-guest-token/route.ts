@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GUEST_TOKEN_KEY } from "@/constants";
+import { cookieManager } from "@/utils/authTools";
 
 const BACKEND_URL = process.env.BACKEND_URL || "";
 const API_KEY = process.env.BACKEND_API_KEY || "";
@@ -11,9 +12,12 @@ const API_KEY = process.env.BACKEND_API_KEY || "";
 export async function GET(request: NextRequest) {
     try {
         const existingToken = request.cookies.get(GUEST_TOKEN_KEY)?.value;
-
+        const user_data = await cookieManager.getAuthUser()
         console.log("Initializing guest token...");
         console.log("Existing token:", existingToken ? "YES" : "NO");
+
+        console.log("user data", user_data ? "YES" : "NO");
+        console.log("user data", user_data);
 
         if (existingToken) {
             return NextResponse.json(
@@ -22,6 +26,12 @@ export async function GET(request: NextRequest) {
             );
         }
 
+        if (user_data) {
+            return NextResponse.json(
+                { message: "user is authenticated", success: true },
+                { status: 200 }
+            )
+        }
         // Call backend - include existing token if available
         const backendResponse = await fetch(`${BACKEND_URL}/v1/cart`, {
             method: "GET",
