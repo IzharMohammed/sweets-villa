@@ -104,7 +104,7 @@ export default function OTPDrawer({ isAuthenticated, onLoginSuccess }: OTPDrawer
       <Button 
         onClick={() => {
           if (isAuthenticated) {
-            router.push("/orders");
+            router.push("/checkout");
           } else {
             setParentOpen(true);
           }
