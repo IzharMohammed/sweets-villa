@@ -2,7 +2,7 @@
 
 import { getCartItems } from "@/actions/cart";
 import { useCartStore } from "@/store/cart-store";
-import { Home, ShoppingBag, ShoppingCart, User } from "lucide-react";
+import { Home, Package, ShoppingBag, ShoppingCart, User } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
 export default function BottomNav() {
@@ -15,7 +15,7 @@ export default function BottomNav() {
     if (pathname === "/") return "home";
     if (pathname.startsWith("/products")) return "products";
     if (pathname.startsWith("/cart")) return "cart";
-    if (pathname.startsWith("/profile")) return "profile";
+    if (pathname.startsWith("/orders")) return "orders";
     return "home";
   };
   const activeTab = getActiveTab();
@@ -113,17 +113,17 @@ export default function BottomNav() {
         </button>
 
         <button
-          onClick={() => router.push("/profile")}
+          onClick={() => router.push("/orders")}
           className="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl transition-all duration-200"
         >
           <div
             className={`transition-all duration-200 ${
-              activeTab === "profile" ? "scale-110" : "scale-100"
+              activeTab === "orders" ? "scale-110" : "scale-100"
             }`}
           >
-            <User
+            <Package
               className={`w-6 h-6 transition-all duration-200 ${
-                activeTab === "profile"
+                activeTab === "orders"
                   ? "text-blue-600 fill-blue-600"
                   : "text-gray-700"
               }`}
@@ -131,12 +131,12 @@ export default function BottomNav() {
           </div>
           <span
             className={`text-[10px] font-medium transition-all duration-200 ${
-              activeTab === "profile"
+              activeTab === "orders"
                 ? "text-blue-600 scale-95"
                 : "text-gray-700"
             }`}
           >
-            Profile
+            Orders
           </span>
         </button>
       </div>

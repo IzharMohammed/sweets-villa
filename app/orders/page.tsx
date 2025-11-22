@@ -2,6 +2,7 @@ import { getOrders } from "@/actions/order";
 import Image from "next/image";
 import Link from "next/link";
 import { Package, Calendar, MapPin, ChevronRight } from "lucide-react";
+import BottomNav from "@/components/bottom-nav";
 
 export default async function Orders() {
   const { data: orders } = await getOrders();
@@ -133,6 +134,7 @@ export default async function Orders() {
           </div>
         )}
       </div>
+      <BottomNav />
     </div>
   );
 }
