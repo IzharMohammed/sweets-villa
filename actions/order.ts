@@ -33,7 +33,6 @@ export async function getOrders() {
             throw new Error("Failed to fetch orders");
         }
 
-        // return response.json();
         const data = await response.json();
 
         return data;
@@ -43,7 +42,7 @@ export async function getOrders() {
     }
 }
 
-export async function createOrder(orderData) {
+export async function createOrder(orderData: any) {
     // Check if environment variables are set
     if (!API_KEY || !BACKEND_URL) {
         console.error(
@@ -64,17 +63,7 @@ export async function createOrder(orderData) {
     }
 
     try {
-        const userData = await cookieManager.getAuthUser();
-
-        const headers = {
-            "Content-Type": "application/json",
-            "x-api-key": API_KEY,
-        };
-
-        // Add custom headers if user is authenticated
-        if (userData) {
-            headers["x-customer-id"] = userData.id;
-        }
+        const headers = await cookieManager.buildApiHeaders();
 
         const response = await fetch(`${BACKEND_URL}/v1/order`, {
             method: "POST",
