@@ -42,7 +42,19 @@ export async function getOrders() {
     }
 }
 
-export async function createOrder(orderData: any) {
+export async function createOrder(orderData: {
+    items: any[];
+    total: number;
+    paymentId: string;
+    paymentMethod: string;
+    shippingAddress?: {
+        street: string;
+        city: string;
+        state: string;
+        zipCode: string;
+        country: string;
+    };
+}) {
     // Check if environment variables are set
     if (!API_KEY || !BACKEND_URL) {
         console.error(
@@ -53,6 +65,7 @@ export async function createOrder(orderData: any) {
             message: "Server configuration error. Please try again later.",
         };
     }
+    console.log("orderData from actions", orderData);
 
     // Basic validation
     if (!orderData.items || orderData.items.length === 0) {
@@ -73,6 +86,7 @@ export async function createOrder(orderData: any) {
                 tags: ["orders", "cart"],
             },
         });
+        console.log("response", response);
 
         if (!response.ok) {
             const errorData = await response.json();
