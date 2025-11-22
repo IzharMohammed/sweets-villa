@@ -3,6 +3,8 @@ import { cookieManager } from "@/utils/authTools";
 export default async function Profile() {
   const userDetails = await cookieManager.getAuthUser();
   console.log("userDetails", userDetails);
+  const guestToken = await cookieManager.getGuestToken();
+  console.log(guestToken);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-pink-50">
@@ -46,11 +48,11 @@ export default async function Profile() {
                   Sweet Customer
                 </h2>
                 <p className="text-amber-700 text-sm sm:text-base font-medium">
-                  Member ID: {userDetails?.id?.slice(0, 12)}...
+                  Member ID: {userDetails?.id}
                 </p>
-                <div className="mt-3 inline-block bg-amber-100 text-amber-800 px-4 py-1 rounded-full text-sm font-semibold">
-                  ⭐ Premium Member
-                </div>
+                <p className="text-amber-700 text-sm sm:text-base font-medium">
+                  {guestToken ? "Guest user" : "Auth user"}
+                </p>
               </div>
             </div>
 

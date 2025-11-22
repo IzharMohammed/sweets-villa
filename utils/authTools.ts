@@ -62,9 +62,13 @@ export class CookieManager {
     }
 
     async isAuthenticated(): Promise<boolean> {
-        const token = await this.getAuthToken();
+        // const token = await this.getAuthToken();
+        // const user = await this.getAuthUser();
+        // return !!(token && user);
+
+        // For now i am just checking user not token
         const user = await this.getAuthUser();
-        return !!(token && user);
+        return !!user;
     }
 
     // ========= GUEST TOKEN =========

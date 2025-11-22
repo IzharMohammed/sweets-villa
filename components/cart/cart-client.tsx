@@ -1,10 +1,5 @@
 "use client";
 
-/**
- *
- * d73ea05e-5c09-4424-9510-7410f763b798
- */
-
 import Image from "next/image";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -56,10 +51,12 @@ interface CartData {
   message: string;
 }
 
-export default function CartClient({ cart }: { cart: CartData }) {
+export default function CartClient({ cart, isAuthenticated }: { cart: CartData, isAuthenticated: boolean }) {
   const router = useRouter();
   const [items, setItems] = useState(cart.data);
   const setCount = useCartStore((s) => s.setCount);
+  console.log("isAuthenticated",isAuthenticated);
+  
   useEffect(() => {
     setCount(cart.count);
   }, [cart.count, setCount]);
@@ -260,8 +257,10 @@ export default function CartClient({ cart }: { cart: CartData }) {
                   </div>
                 </div>
               </div>
-
-              <OTPDrawer onLoginSuccess={handleLoginSuccess} />
+            
+              <OTPDrawer 
+              isAuthenticated={isAuthenticated}
+              onLoginSuccess={handleLoginSuccess} />
 
               <button
                 onClick={() => router.push("/products")}

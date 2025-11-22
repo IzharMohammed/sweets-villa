@@ -96,6 +96,27 @@ export async function verifyOtp(
         }
 
         const headers = await cookieManager.buildApiHeaders();
+        /**
+         * data from verify otp {
+         *  success: true,
+            message: 'Phone verified successfully',
+          status: true,
+          token: '',
+          user: {
+            id: 'cmi9z4rq00000zvlbcztdcfne',
+            email: '1987364537@mlsweets.com',
+            emailVerified: false,
+            name: '1987364537',
+            image: null,
+            phoneNumber: '1987364537',
+            phoneNumberVerified: true,
+            createdAt: 2025-11-22T07:34:56.855Z,
+            updatedAt: 2025-11-22T07:34:56.855Z
+          }
+        }
+         * 
+         * 
+         */
 
         const response = await fetch(`${BACKEND_URL}/v1/auth/phone-number/verify`, {
             method: "POST",
@@ -132,6 +153,8 @@ export async function verifyOtp(
 
         // Merge guest data if guest token exists
         if (guestToken) {
+            console.log("Merge guest data");
+
             try {
                 const mergeResponse = await fetch(
                     `${BACKEND_URL}/v1/auth/merge-guest-data`,
@@ -145,6 +168,8 @@ export async function verifyOtp(
                         body: JSON.stringify({ guestToken }),
                     }
                 );
+
+                console.log("mergeResponse", mergeResponse);
 
                 if (mergeResponse.ok) {
                     const mergeData = await mergeResponse.json();
@@ -175,6 +200,7 @@ export async function verifyOtp(
                     user: {
                         id: data.user.id,
                         phone: data.user.phone,
+                        name: data.user.name,
                         email: data.user.email,
                         phoneNumberVerified: data.user.phoneNumberVerified
                     }

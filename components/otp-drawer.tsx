@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -18,10 +19,12 @@ import { toast } from "sonner";
 import { sendOtp, verifyOtp } from "@/actions/auth";
 
 interface OTPDrawerProps {
+  isAuthenticated: boolean;
   onLoginSuccess?: () => void;
 }
 
-export default function OTPDrawer({ onLoginSuccess }: OTPDrawerProps) {
+export default function OTPDrawer({ isAuthenticated, onLoginSuccess }: OTPDrawerProps) {
+  const router = useRouter();
   const [parentOpen, setParentOpen] = useState(false);
   const [otpOpen, setOtpOpen] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -77,14 +80,14 @@ export default function OTPDrawer({ onLoginSuccess }: OTPDrawerProps) {
       setOtp("");
 
       // Call success callback
-      if (onLoginSuccess) {
-        onLoginSuccess();
-      }
-
-      alert("Login successful!");
+      // if (onLoginSuccess) {
+      //   onLoginSuccess();
+      // }
+      toast.success("Login successful!"); 
+      router.push("/orders");
     } catch (error) {
       console.error("Error verifying OTP:", error);
-      alert("Invalid OTP. Please try again.");
+      toast.error("Invalid OTP. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -98,11 +101,18 @@ export default function OTPDrawer({ onLoginSuccess }: OTPDrawerProps) {
 
   return (
     <Drawer open={parentOpen} onOpenChange={setParentOpen}>
-      <DrawerTrigger asChild>
-        <Button className="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-3 rounded-xl font-medium transition-colors shadow-md hover:shadow-lg">
-          Proceed to Checkout
-        </Button>
-      </DrawerTrigger>
+      <Button 
+        onClick={() => {
+          if (isAuthenticated) {
+            router.push("/orders");
+          } else {
+            setParentOpen(true);
+          }
+        }}
+        className="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-3 rounded-xl font-medium transition-colors shadow-md hover:shadow-lg"
+      >
+        Proceed to Checkout
+      </Button>
 
       <DrawerContent>
         <DrawerHeader>
