@@ -6,7 +6,42 @@ import { revalidateTag } from "next/cache";
 const API_KEY = process.env.BACKEND_API_KEY || "";
 const BACKEND_URL = process.env.BACKEND_URL || "";
 
-export async function getOrders() {
+export interface OrderItem {
+    id: string;
+    price: number;
+    quantity: number;
+    product: {
+        name: string;
+        image: string[];
+    };
+    variantId: string;
+}
+
+export interface ShippingAddress {
+    city: string;
+    state: string;
+    street: string;
+    country: string;
+    zipCode: string;
+}
+
+export interface Order {
+    id: string;
+    createdAt: string;
+    status: string;
+    total: number;
+    items: OrderItem[];
+    shippingAddress: ShippingAddress | null;
+}
+
+export interface OrdersResponse {
+    success: boolean;
+    data: Order[];
+    count: number;
+    message: string;
+}
+
+export async function getOrders(): Promise<OrdersResponse> {
     // Check if environment variables are set
     if (!API_KEY || !BACKEND_URL) {
         console.error(
