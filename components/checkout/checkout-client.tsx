@@ -66,92 +66,40 @@ export default function CheckoutClient({ cartData }: { cartData: CartData }) {
 
 //   console.log(cartData);
 
-//   const handlePayment = async (address: AddressFormData) => {
-//     setIsProcessing(true);
-
-//     try {
-//       // 1. Create Order
-//       const { success, order, error } = await createRazorpayOrder(
-//         cartData.summary.subtotal
-//       );
-
-//       if (!success || !order) {
-//         toast.error(error || "Failed to create payment order");
-//         setIsProcessing(false);
-//         return;
-//       }
-
-//       // 2. Initialize Razorpay
-//       const options = {
-//         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-//         amount: order.amount,
-//         currency: order.currency,
-//         name: "Sweets Villa",
-//         description: "Payment for your order",
-//         order_id: order.id,
-//         handler: async function (response: any) {
-//           // 3. Verify Payment
-//           const verification = await verifyRazorpayPayment(
-//             response.razorpay_order_id,
-//             response.razorpay_payment_id,
-//             response.razorpay_signature
-//           );
-
-//           if (verification.success) {
-//             // 4. Create Order in Backend
-//             const orderData = {
-//               items: cartData.data.map((item) => ({
-//                 productId: item.product.id,
-//                 variantId: item.variantId,
-//                 quantity: item.quantity,
-//                 price: item.variant.price,
-//               })),
-//               totalAmount: cartData.summary.subtotal,
-//               paymentId: response.razorpay_payment_id,
-//               paymentMethod: "RAZORPAY",
-//               shippingAddress: address,
-//             };
-
-//             const result = await createOrder(orderData);
-
-//             if (result.success) {
-//               toast.success("Order placed successfully!");
-//               router.push("/orders");
-//             } else {
-//               toast.error(result.message || "Failed to place order");
-//             }
-//           } else {
-//             toast.error("Payment verification failed");
-//           }
-//           setIsProcessing(false);
-//         },
-//         prefill: {
-//           name: "Customer Name", // TODO: Get from user profile
-//           email: "customer@example.com", // TODO: Get from user profile
-//           contact: "9999999999", // TODO: Get from user profile
-//         },
-//         theme: {
-//           color: "#D97706", // amber-600
-//         },
-//       };
-
-//       const rzp1 = new window.Razorpay(options);
-//       rzp1.on("payment.failed", function (response: any) {
-//         toast.error(response.error.description || "Payment failed");
-//         setIsProcessing(false);
-//       });
-//       rzp1.open();
-//     } catch (error) {
-//       console.error("Payment error:", error);
-//       toast.error("Something went wrong");
-//       setIsProcessing(false);
-//     }
-//   };
-
   const handlePayment = async (address: AddressFormData) => {
     setIsProcessing(true);
 
-     try {
+    try {
+      // 1. Create Order
+      const { success, order, error } = await createRazorpayOrder(
+        cartData.summary.subtotal
+      );
+
+      if (!success || !order) {
+        toast.error(error || "Failed to create payment order");
+        setIsProcessing(false);
+        return;
+      }
+
+      // 2. Initialize Razorpay
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: order.currency,
+        name: "Sweets Villa",
+        description: "Payment for your order",
+        order_id: order.id,
+        handler: async function (response: any) {
+          // 3. Verify Payment
+          const verification = await verifyRazorpayPayment(
+            response.razorpay_order_id,
+            response.razorpay_payment_id,
+            response.razorpay_signature
+          );
+          
+          console.log("verification from razorpay",verification);
+
+          if (verification.success) {
             // 4. Create Order in Backend
             const orderData = {
               items: cartData.data.map((item) => ({
@@ -161,12 +109,19 @@ export default function CheckoutClient({ cartData }: { cartData: CartData }) {
                 price: item.variant.price,
               })),
               total: cartData.summary.subtotal,
-              paymentId: "",
-              paymentMethod: "RAZORPAY",
+              payment: {
+                gateway: "RAZORPAY",
+                method: "OTHER", // TODO: Can be refined if we get method from Razorpay
+                status: "AUTHORIZED", // Since we verified signature
+                amount: order.amount,
+                currency: order.currency,
+                gatewayOrderId: response.razorpay_order_id,
+                gatewayPaymentId: response.razorpay_payment_id,
+                gatewaySignature: response.razorpay_signature,
+              },
               shippingAddress: address,
             };
-            console.log("orderData",orderData);
-            
+
             const result = await createOrder(orderData);
 
             if (result.success) {
@@ -175,8 +130,27 @@ export default function CheckoutClient({ cartData }: { cartData: CartData }) {
             } else {
               toast.error(result.message || "Failed to place order");
             }
-          
+          } else {
+            toast.error("Payment verification failed");
+          }
           setIsProcessing(false);
+        },
+        prefill: {
+          name: "Customer Name", // TODO: Get from user profile
+          email: "customer@example.com", // TODO: Get from user profile
+          contact: "9999999999", // TODO: Get from user profile
+        },
+        theme: {
+          color: "#D97706", // amber-600
+        },
+      };
+
+      const rzp1 = new window.Razorpay(options);
+      rzp1.on("payment.failed", function (response: any) {
+        toast.error(response.error.description || "Payment failed");
+        setIsProcessing(false);
+      });
+      rzp1.open();
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Something went wrong");
