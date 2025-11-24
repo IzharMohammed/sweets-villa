@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Package, Calendar, MapPin, ChevronRight } from "lucide-react";
 import BottomNav from "@/components/bottom-nav";
 
+export const dynamic = 'force-dynamic';
+
 export default async function Orders() {
   const { data: orders } = await getOrders();
 
