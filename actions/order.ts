@@ -32,6 +32,13 @@ export interface Order {
     total: number;
     items: OrderItem[];
     shippingAddress: ShippingAddress | null;
+    payments: {
+        id: string;
+        status: string;
+        amount: number;
+        method: string;
+        gateway: string;
+    }[];
 }
 
 export interface OrdersResponse {
@@ -80,8 +87,16 @@ export async function getOrders(): Promise<OrdersResponse> {
 export async function createOrder(orderData: {
     items: any[];
     total: number;
-    paymentId: string;
-    paymentMethod: string;
+    payment: {
+        gateway: string;
+        method: string;
+        status: string;
+        amount: number | string;
+        currency: string;
+        gatewayOrderId?: string;
+        gatewayPaymentId?: string;
+        gatewaySignature?: string;
+    };
     shippingAddress?: {
         street: string;
         city: string;
@@ -121,7 +136,7 @@ export async function createOrder(orderData: {
                 tags: ["orders", "cart"],
             },
         });
-        console.log("response", response);
+        console.log("response from order", response);
 
         if (!response.ok) {
             const errorData = await response.json();
