@@ -94,7 +94,8 @@ export default function HeroSection() {
         ".description",
         {
           opacity: 0,
-          y: 50,
+          y: -150, // Move UP instead of down
+          filter: "blur(10px)", // Add blur effect
           duration: 0.8,
           ease: "power2.in",
         },
