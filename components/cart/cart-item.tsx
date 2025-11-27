@@ -2,47 +2,48 @@
 
 import Image from "next/image";
 import { Minus, Plus, Trash2 } from "lucide-react";
-
-interface Variant {
-  id: string;
-  displayName: string;
-  finalPrice: number;
-  price: number;
-  discount: number;
-  quantity: number;
-  sku: string | null;
-  stock: number;
-  unit: string;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  image: string[];
-  category: string;
-  status: string;
-}
-
-interface CartItemData {
-  id: string;
-  addedAt: string;
-  lineTotal: number;
-  product: Product;
-  quantity: number;
-  variant: Variant;
-  variantId: string;
-}
+import { useState, useTransition } from "react";
+import { updateCartQuantity, removeFromCart } from "@/actions/cart";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface CartItemProps {
-  item: CartItemData;
-  updateQuantity: (itemId: string, newQuantity: number) => void;
-  removeItem: (itemId: string) => void;
+  item: any; // Using any for now to match existing structure, should be typed properly
 }
 
-export default function CartItem({ item, updateQuantity, removeItem }: CartItemProps) {
+export default function CartItem({ item }: CartItemProps) {
+  const [isPending, startTransition] = useTransition();
+  const [quantity, setQuantity] = useState(item.quantity);
+
+  const handleUpdateQuantity = (newQuantity: number) => {
+    if (newQuantity < 1) return;
+    setQuantity(newQuantity); // Optimistic update
+    
+    startTransition(async () => {
+      const result = await updateCartQuantity(item.id, newQuantity);
+      if (!result.success) {
+        toast.error(result.message);
+        setQuantity(item.quantity); // Revert on failure
+      }
+    });
+  };
+
+  const handleRemove = () => {
+    startTransition(async () => {
+      const result = await removeFromCart(item.id);
+      if (result.success) {
+        toast.success("Item removed");
+      } else {
+        toast.error(result.message);
+      }
+    });
+  };
+
   return (
-    <div className="bg-white rounded-2xl shadow-md p-4 hover:shadow-lg transition-shadow">
+    <div className={cn(
+      "bg-white rounded-2xl shadow-sm p-4 hover:shadow-md transition-all duration-300 border border-transparent hover:border-amber-100",
+      isPending && "opacity-70 pointer-events-none"
+    )}>
       <div className="flex gap-4">
         {/* Product Image */}
         <div className="relative w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl overflow-hidden">
@@ -69,8 +70,9 @@ export default function CartItem({ item, updateQuantity, removeItem }: CartItemP
 
             {/* Remove Button - Desktop */}
             <button
-              onClick={() => removeItem(item.id)}
-              className="hidden sm:block text-red-500 hover:text-red-700 transition-colors p-1"
+              onClick={handleRemove}
+              disabled={isPending}
+              className="hidden sm:block text-red-500 hover:text-red-700 transition-colors p-1 rounded-full hover:bg-red-50"
               aria-label="Remove item"
             >
               <Trash2 className="w-5 h-5" />
@@ -80,24 +82,25 @@ export default function CartItem({ item, updateQuantity, removeItem }: CartItemP
           {/* Price and Quantity Controls */}
           <div className="flex items-center justify-between mt-3">
             {/* Quantity Controls */}
-            <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+            <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-1 border border-gray-100">
               <button
-                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                disabled={item.quantity <= 1}
-                className="p-1.5 hover:bg-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => handleUpdateQuantity(quantity - 1)}
+                disabled={quantity <= 1 || isPending}
+                className="p-1.5 hover:bg-white hover:shadow-sm rounded-md transition-all disabled:opacity-50 disabled:cursor-not-allowed text-gray-600"
                 aria-label="Decrease quantity"
               >
-                <Minus className="w-4 h-4 text-gray-700" />
+                <Minus className="w-4 h-4" />
               </button>
-              <span className="w-8 text-center font-medium text-gray-800">
-                {item.quantity}
+              <span className="w-8 text-center font-medium text-gray-800 tabular-nums">
+                {quantity}
               </span>
               <button
-                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                className="p-1.5 hover:bg-white rounded-md transition-colors"
+                onClick={() => handleUpdateQuantity(quantity + 1)}
+                disabled={isPending}
+                className="p-1.5 hover:bg-white hover:shadow-sm rounded-md transition-all text-gray-600"
                 aria-label="Increase quantity"
               >
-                <Plus className="w-4 h-4 text-gray-700" />
+                <Plus className="w-4 h-4" />
               </button>
             </div>
 
@@ -108,7 +111,7 @@ export default function CartItem({ item, updateQuantity, removeItem }: CartItemP
               </p>
               {item.variant.discount > 0 && (
                 <p className="text-xs text-gray-400 line-through">
-                  ₹{item.variant.price * item.quantity}
+                  ₹{item.variant.price * quantity}
                 </p>
               )}
             </div>
@@ -116,8 +119,9 @@ export default function CartItem({ item, updateQuantity, removeItem }: CartItemP
 
           {/* Remove Button - Mobile */}
           <button
-            onClick={() => removeItem(item.id)}
-            className="sm:hidden flex items-center gap-1 text-red-500 hover:text-red-700 transition-colors text-sm mt-2"
+            onClick={handleRemove}
+            disabled={isPending}
+            className="sm:hidden flex items-center gap-1 text-red-500 hover:text-red-700 transition-colors text-sm mt-3 font-medium"
           >
             <Trash2 className="w-4 h-4" />
             <span>Remove</span>
