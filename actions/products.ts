@@ -28,8 +28,9 @@ export async function getProducts(filters = {}) {
         const response = await fetch(url, {
             method: "GET",
             headers,
-            cache: "no-store",
+            // cache: "no-store",
             next: {
+                revalidate: 3600, // Cache for 1 hour
                 tags: ["products"],
             },
         });
