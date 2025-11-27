@@ -310,6 +310,7 @@ export default function ProductDetailClient({
                     src={img}
                     alt={product.name}
                     fill
+                    priority={index === 0}
                     className="object-cover"
                   />
                 </div>

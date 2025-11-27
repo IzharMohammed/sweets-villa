@@ -69,8 +69,9 @@ export async function getProductDetails(productId: string) {
         const response = await fetch(`${BACKEND_URL}/v1/products/${productId}`, {
             method: "GET",
             headers,
-            cache: "no-store", // Ensure fresh data on each request
+            // cache: "no-store", // Ensure fresh data on each request
             next: {
+                revalidate: 3600, // Cache for 1 hour
                 tags: ["products"],
             },
         });
