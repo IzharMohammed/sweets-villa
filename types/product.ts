@@ -1,4 +1,5 @@
 export interface Variant {
+    id: string;
     discount: number;
     price: number;
     stock: number;
