@@ -7,11 +7,14 @@ import { updateCartQuantity, removeFromCart } from "@/actions/cart";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
+import { useRouter } from "next/navigation";
+
 interface CartItemProps {
   item: any; // Using any for now to match existing structure, should be typed properly
 }
 
 export default function CartItem({ item }: CartItemProps) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [quantity, setQuantity] = useState(item.quantity);
 
@@ -21,7 +24,9 @@ export default function CartItem({ item }: CartItemProps) {
     
     startTransition(async () => {
       const result = await updateCartQuantity(item.id, newQuantity);
-      if (!result.success) {
+      if (result.success) {
+        router.refresh();
+      } else {
         toast.error(result.message);
         setQuantity(item.quantity); // Revert on failure
       }
@@ -33,6 +38,7 @@ export default function CartItem({ item }: CartItemProps) {
       const result = await removeFromCart(item.id);
       if (result.success) {
         toast.success("Item removed");
+        router.refresh();
       } else {
         toast.error(result.message);
       }
