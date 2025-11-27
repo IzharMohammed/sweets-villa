@@ -106,3 +106,59 @@ export async function addToCart(productId: string, variantId: string, quantity: 
         throw error;
     }
 }
+
+export async function removeFromCart(cartId: string) {
+    try {
+        const headers = await cookieManager.buildApiHeaders();
+
+        const response = await fetch(`${BACKEND_URL}/v1/cart`, {
+            method: "DELETE",
+            headers,
+            body: JSON.stringify({ cartId }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to remove cart item");
+        }
+
+        revalidateTag("cart", "max");
+        return {
+            success: true,
+            message: "Item removed from cart successfully...!!!",
+        };
+    } catch (error) {
+        console.error("Remove from cart failed:", error);
+        throw error;
+    }
+}
+
+export async function updateCartQuantity(cartId: string, newQuantity: number) {
+    try {
+        const headers = await cookieManager.buildApiHeaders();
+
+        const response = await fetch(`${BACKEND_URL}/v1/cart/update`, {
+            method: "PATCH",
+            headers,
+            body: JSON.stringify({
+                cartItemId: cartId,
+                action: "set",
+                quantity: newQuantity,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to update cart items");
+        }
+
+        revalidateTag("cart", "max");
+        return {
+            success: true,
+            message: "Item updated in cart successfully...!!!",
+        };
+    } catch (error) {
+        console.error("Update cart failed:", error);
+        throw error;
+    }
+}
