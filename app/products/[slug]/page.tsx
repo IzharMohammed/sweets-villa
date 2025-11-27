@@ -1,5 +1,7 @@
 import { getProductDetails } from "@/actions/products";
-import ProductDetailClient from "@/components/products/product-details";
+import ProductImageGallery from "@/components/products/product-image-gallery";
+import ProductActions from "@/components/products/product-actions";
+import { libre, montserrat, lato } from "@/lib/fonts";
 
 export interface ProductResponse {
   success: boolean;
@@ -43,6 +45,69 @@ export default async function ProductDetailsPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = (await getProductDetails(slug)) as ProductResponse;
-  return <ProductDetailClient product={product.data} />;
+  const response = (await getProductDetails(slug)) as ProductResponse;
+  const product = response.data;
+
+  // Default variant logic if needed, but ProductActions handles it
+  const defaultVariant = product.variants.find((v) => v.isDefault) || product.variants[0];
+
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="grid grid-cols-1 lg:grid-cols-2">
+        {/* LEFT SIDE - Full Height Image Gallery (Client Component) */}
+        <ProductImageGallery images={product.image} productName={product.name} />
+
+        {/* RIGHT SIDE - Product Details (Server Rendered Static Content + Client Actions) */}
+        <div className="px-6 py-8 sm:px-12 sm:py-12 lg:px-16">
+          {/* Rating */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="flex text-yellow-500 text-sm">
+              {[...Array(5)].map((_, i) => (
+                <span key={i}>★</span>
+              ))}
+            </div>
+            <span className="text-sm text-gray-600">5.0</span>
+          </div>
+
+          {/* Product Name */}
+          <h1
+            className={`${libre.className} text-3xl sm:text-4xl font-normal text-gray-900 mb-3`}
+          >
+            {product.name}
+          </h1>
+
+          {/* Short Description */}
+          <p
+            className={`${montserrat.className} text-gray-700 mb-6 leading-relaxed text-base`}
+          >
+            {product.description}
+          </p>
+
+          {/* Key Features */}
+          <div className="space-y-2 mb-8">
+            <div className="flex items-start gap-3 text-sm text-gray-700">
+              <span className="mt-1.5">•</span>
+              <span>Premium quality ingredients</span>
+            </div>
+            <div className="flex items-start gap-3 text-sm text-gray-700">
+              <span className="mt-1.5">•</span>
+              <span>Freshly made daily</span>
+            </div>
+            <div className="flex items-start gap-3 text-sm text-gray-700">
+              <span className="mt-1.5">•</span>
+              <span>Traditional recipe</span>
+            </div>
+          </div>
+
+          {/* Interactive Actions (Variants, Quantity, Cart, Accordion) */}
+          <ProductActions 
+            productId={product.id} 
+            variants={product.variants} 
+            description={product.description}
+            category={product.category}
+          />
+        </div>
+      </div>
+    </div>
+  );
 }
