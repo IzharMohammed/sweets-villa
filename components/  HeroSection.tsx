@@ -161,7 +161,7 @@ export default function HeroSection() {
       {/* Hero Section */}
       <section
         ref={heroRef}
-        className="relative h-[200vh] bg-[#0F172A] hidden lg:block"
+        className="relative h-[120vh] bg-[#0F172A] hidden lg:block"
       >
         <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
           {/* Premium Background */}
