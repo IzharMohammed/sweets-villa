@@ -1,32 +1,27 @@
-// v3
+// v5 - Premium Redesign
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { SplitText } from "gsap/all";
-import { Poppins } from "next/font/google";
+import { Poppins, Playfair_Display, Cormorant_Garamond } from "next/font/google";
 import BottomNav from "./bottom-nav";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const poppins = Poppins({ weight: "400", style: "normal", subsets: ["latin"] });
+const poppins = Poppins({ weight: ["300", "400", "500"], style: "normal", subsets: ["latin"] });
+const playfair = Playfair_Display({ weight: ["400", "600", "700"], style: ["normal", "italic"], subsets: ["latin"] });
+const cormorant = Cormorant_Garamond({ weight: ["300", "400", "500", "600"], style: ["normal", "italic"], subsets: ["latin"] });
 
 export default function HeroSection() {
-  const navTitleRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
+  const navTitleTargetRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
     // Initial entrance animations
-    gsap.from(titleRef.current, {
-      y: 50,
-      opacity: 0,
-      duration: 1.5,
-      ease: "expo.out",
-    });
-
     const heroSplit = new SplitText(".title", {
       type: "chars, words",
     });
@@ -35,289 +30,130 @@ export default function HeroSection() {
       type: "lines",
     });
 
-    heroSplit.chars.forEach((char) => char.classList.add("text-gradient"));
-
-    gsap.from(heroSplit.chars, {
-      yPercent: 100,
-      duration: 1.8,
-      ease: "expo.out",
-      stagger: 0.06,
+    // Elegant fade in for title
+    const tl = gsap.timeline();
+    
+    tl.from(titleRef.current, {
+      y: 30,
       opacity: 0,
-      delay: 0.5,
-    });
-
-    gsap.from(paragraphSplit.lines, {
+      duration: 1.5,
+      ease: "power3.out",
+    })
+    .from(heroSplit.chars, {
+      y: 40,
       opacity: 0,
-      yPercent: 100,
-      duration: 1.8,
-      ease: "expo.out",
-      stagger: 0.06,
-      delay: 1.5,
-    });
-
-    gsap.from(".nav-link", {
-      y: -30,
+      rotationX: -90,
+      duration: 1.2,
+      ease: "back.out(1.7)",
+      stagger: 0.03,
+    }, "-=1.0")
+    .from(paragraphSplit.lines, {
+      opacity: 0,
+      y: 20,
+      duration: 1,
+      ease: "power2.out",
+      stagger: 0.1,
+    }, "-=0.8")
+    .from(".nav-link", {
+      y: -20,
       opacity: 0,
       duration: 0.8,
-      ease: "power3.out",
-      stagger: 0.15,
-    });
+      ease: "power2.out",
+      stagger: 0.1,
+    }, "-=1.0")
+    .from(".hero-btn", {
+      scale: 0.9,
+      opacity: 0,
+      duration: 0.8,
+      ease: "power2.out",
+    }, "-=0.5");
 
-    // Scroll-based shrink animation
-    const navbarHeight = 60;
+    // Scroll Animation Logic
     const titleElement = titleRef.current;
 
-    if (titleElement) {
-      const titleWidth = titleElement.offsetWidth;
-      const targetWidth = window.innerWidth * 0.3;
-      const targetScale = targetWidth / titleWidth;
-      const targetY = -(window.innerHeight / 2) + navbarHeight / 2;
-
-      const t1 = gsap.timeline({
+    if (titleElement && heroRef.current) {
+      const scrollAnim = gsap.timeline({
         scrollTrigger: {
           trigger: heroRef.current,
           start: "top top",
-          end: "bottom top",
-          scrub: 1.5,
+          end: "40% top",
+          scrub: 1,
           pin: false,
-        },
+        }
       });
 
-      t1.to(titleElement, {
-        scale: targetScale,
+      // Calculate target position (center of navbar)
+      // Navbar height ~80px, center ~40px
+      // Initial title center ~50vh
+      const vh = window.innerHeight;
+      const targetY = -(vh * 0.5) + 40; 
+      
+      // Target Scale (approximate for text-xl vs text-7xl)
+      // 1.25rem (20px) / 4.5rem (72px) ~ 0.28
+      const targetScale = 0.28;
+
+      scrollAnim.to(titleElement, {
         y: targetY,
+        scale: targetScale,
+        color: "#ffffff",
         duration: 1,
-        ease: "power2.inOut",
+        ease: "power1.inOut"
       });
 
-      t1.to(
-        ".description",
-        {
-          opacity: 0,
-          y: -150, // Move UP instead of down
-          filter: "blur(10px)", // Add blur effect
-          duration: 0.8,
-          ease: "power2.in",
-        },
-        0
-      );
+      // Fade out other elements elegantly
+      scrollAnim.to([".description", ".background-image", ".scroll-indicator"], {
+        opacity: 0,
+        y: -30,
+        filter: "blur(5px)",
+        duration: 0.5
+      }, 0);
+      
+      // Ensure z-index is high so it sits on top of navbar
+      gsap.set(titleElement, { zIndex: 60 });
     }
 
-    // Show navbar title when hero is gone
-    ScrollTrigger.create({
-      trigger: heroRef.current,
-      start: "bottom top",
-      onEnter: () => {
-        gsap.to(navTitleRef.current, {
-          opacity: 1,
-          duration: 0.3,
-        });
-      },
-      onLeaveBack: () => {
-        gsap.to(navTitleRef.current, {
-          opacity: 0,
-          duration: 0.3,
-        });
-      },
-    });
-
-    return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-    };
   }, []);
 
   return (
     <>
-      {/* Desktop Navbar - Hidden on mobile */}
-      <nav className="hidden lg:block fixed top-0 left-0 w-full z-50 bg-slate-800/80 backdrop-blur-md">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+      {/* Desktop Navbar - Premium Glassmorphism */}
+      <nav className="hidden lg:block fixed top-0 left-0 w-full z-50 bg-slate-900/40 backdrop-blur-md border-b border-white/10 h-[80px] transition-all duration-300">
+        <div className="container mx-auto px-8 h-full flex items-center justify-between">
+          <div className="flex items-center space-x-10">
+            {["SHOP", "COLLECTIONS", "OUR STORY", "GIFTING"].map((item) => (
+              <a
+                key={item}
+                href="#"
+                className={`nav-link relative text-white/90 text-xs tracking-[0.2em] font-medium hover:text-white transition-colors uppercase ${poppins.className}
+                  after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[1px] after:bg-amber-200 after:transition-all after:duration-300 hover:after:w-full`}
+              >
+                {item}
+              </a>
+            ))}
+          </div>
+
+          {/* Placeholder for title */}
+          <div className="w-[300px]" />
+
           <div className="flex items-center space-x-8">
-            <a
-              href="#"
-              className="nav-link relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full"
-            >
-              SHOP
-            </a>
-            <a
-              href="#"
-              className="nav-link relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full"
-            >
-              COLLECTIONS
-            </a>
-            <a
-              href="#"
-              className="nav-link relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full"
-            >
-              ABOUT US
-            </a>
-            <a
-              href="#"
-              className="nav-link relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full"
-            >
-              SIGNATURE TREATS
-            </a>
-          </div>
-
-          {/* Navbar Title (hidden initially) */}
-          <div
-            ref={navTitleRef}
-            className="absolute left-1/2 -translate-x-1/2 opacity-0"
-          >
-            <h2 className="text-white text-xl font-light tracking-wider">
-              SRI MAHALAKSHMI <span className="mx-2">—</span> SWEETS
-            </h2>
-          </div>
-
-          <div className="flex items-center space-x-6">
-            <button className="nav-link relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full">
-              SEARCH
-            </button>
-            <button className="nav-link relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full">
-              ACCOUNT
-            </button>
-            <button className="nav-link relative text-white text-sm after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-white after:transition-all after:duration-300 hover:after:w-full">
-              CART (0)
-            </button>
+            {["SEARCH", "ACCOUNT", "CART (0)"].map((item) => (
+              <button key={item} className={`nav-link relative text-white/90 text-xs tracking-[0.2em] font-medium hover:text-white transition-colors uppercase ${poppins.className}
+                after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[1px] after:bg-amber-200 after:transition-all after:duration-300 hover:after:w-full`}>
+                {item}
+              </button>
+            ))}
           </div>
         </div>
       </nav>
 
       {/* Mobile Bottom Navigation */}
-
-      {/* V1 */}
       <BottomNav />
 
-      {/* v2 */}
-      {/* <nav
-        className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 
-      w-[90%] max-w-md z-50 
-      bg-white/20 backdrop-blur-xl 
-      rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12)]
-      border border-white/30 px-2 py-1"
-      >
-        <div className="flex items-center justify-around">
-          <button
-            onClick={() => setActiveTab("home")}
-            onMouseDown={(e) => onPress(e.currentTarget)}
-            onMouseUp={(e) => onRelease(e.currentTarget)}
-            onTouchStart={(e) => onPress(e.currentTarget)}
-            onTouchEnd={(e) => onRelease(e.currentTarget)}
-            className="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl transition-all duration-200"
-          >
-            <div
-              className={`${
-                activeTab === "home" ? "scale-110" : "scale-100"
-              } transition-all`}
-            >
-              <Home
-                className={`w-6 h-6 ${
-                  activeTab === "home" ? "text-blue-600" : "text-gray-700"
-                }`}
-              />
-            </div>
-            <span
-              className={`text-[10px] font-medium ${
-                activeTab === "home" ? "text-blue-600" : "text-gray-700"
-              }`}
-            >
-              Home
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("products")}
-            onMouseDown={(e) => onPress(e.currentTarget)}
-            onMouseUp={(e) => onRelease(e.currentTarget)}
-            onTouchStart={(e) => onPress(e.currentTarget)}
-            onTouchEnd={(e) => onRelease(e.currentTarget)}
-            className="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl transition-all duration-200"
-          >
-            <div
-              className={`${
-                activeTab === "products" ? "scale-110" : "scale-100"
-              } transition-all`}
-            >
-              <ShoppingBag
-                className={`w-6 h-6 ${
-                  activeTab === "products" ? "text-blue-600" : "text-gray-700"
-                }`}
-              />
-            </div>
-            <span
-              className={`text-[10px] font-medium ${
-                activeTab === "products" ? "text-blue-600" : "text-gray-700"
-              }`}
-            >
-              Products
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("cart")}
-            onMouseDown={(e) => onPress(e.currentTarget)}
-            onMouseUp={(e) => onRelease(e.currentTarget)}
-            onTouchStart={(e) => onPress(e.currentTarget)}
-            onTouchEnd={(e) => onRelease(e.currentTarget)}
-            className="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl transition-all duration-200 relative"
-          >
-            <div
-              className={`${
-                activeTab === "cart" ? "scale-110" : "scale-100"
-              } transition-all`}
-            >
-              <ShoppingCart
-                className={`w-6 h-6 ${
-                  activeTab === "cart" ? "text-blue-600" : "text-gray-700"
-                }`}
-              />
-              <span className="absolute top-0 right-2 bg-red-500 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center">
-                0
-              </span>
-            </div>
-            <span
-              className={`text-[10px] font-medium ${
-                activeTab === "cart" ? "text-blue-600" : "text-gray-700"
-              }`}
-            >
-              Cart
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("profile")}
-            onMouseDown={(e) => onPress(e.currentTarget)}
-            onMouseUp={(e) => onRelease(e.currentTarget)}
-            onTouchStart={(e) => onPress(e.currentTarget)}
-            onTouchEnd={(e) => onRelease(e.currentTarget)}
-            className="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl transition-all duration-200"
-          >
-            <div
-              className={`${
-                activeTab === "profile" ? "scale-110" : "scale-100"
-              } transition-all`}
-            >
-              <User
-                className={`w-6 h-6 ${
-                  activeTab === "profile" ? "text-blue-600" : "text-gray-700"
-                }`}
-              />
-            </div>
-            <span
-              className={`text-[10px] font-medium ${
-                activeTab === "profile" ? "text-blue-600" : "text-gray-700"
-              }`}
-            >
-              Profile
-            </span>
-          </button>
-        </div>
-      </nav> */}
-
-      {/* Mobile Top Navbar - Only visible on mobile */}
-      <nav className="lg:hidden fixed top-0 left-0 w-full z-50 bg-slate-800/95 backdrop-blur-md border-b border-slate-700">
+      {/* Mobile Top Navbar */}
+      <nav className="lg:hidden fixed top-0 left-0 w-full z-50 bg-slate-900/90 backdrop-blur-md border-b border-white/10">
         <div className="px-6 py-4 text-center">
-          <h2 className="text-white text-lg font-light tracking-wider">
-            SRI MAHALAKSHMI <span className="mx-2">—</span> SWEETS
+          <h2 className={`text-white text-lg tracking-widest ${playfair.className}`}>
+            SRI MAHALAKSHMI
           </h2>
         </div>
       </nav>
@@ -325,79 +161,90 @@ export default function HeroSection() {
       {/* Hero Section */}
       <section
         ref={heroRef}
-        className="relative h-[200vh] bg-gradient-to-br from-slate-700 via-slate-600 to-teal-700 hidden lg:block"
+        className="relative h-[200vh] bg-[#0F172A] hidden lg:block"
       >
         <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
-          {/* Background Image - Hidden on mobile, visible on large screens */}
-          <div className="absolute inset-0 hidden lg:block">
+          {/* Premium Background */}
+          <div className="absolute inset-0 hidden lg:block background-image">
+            {/* Dark overlay gradient for depth */}
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-transparent to-slate-900/90 z-[1]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-teal-900/20 via-slate-900/40 to-slate-900/80 z-[1]" />
+            
             <img
               src="/sweets.png"
-              alt="Sweets"
-              className="w-full h-full object-cover opacity-40"
+              alt="Artisanal Sweets"
+              className="w-full h-full object-cover opacity-60 scale-105"
             />
           </div>
 
-          {/* Main Title - Hidden on mobile, visible on large screens */}
+          {/* Main Title - Centered & Elegant */}
           <div
             ref={titleRef}
-            className="relative z-10 text-center -translate-y-48 lg:-translate-y-28 hidden lg:block"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 text-center origin-center w-full pointer-events-none mix-blend-screen"
           >
             <h1
-              className={`no-select title text-white ${poppins.className} text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-light tracking-wider whitespace-nowrap`}
+              className={`title text-white ${playfair.className} text-4xl md:text-6xl lg:text-7xl font-normal tracking-wide whitespace-nowrap drop-shadow-2xl`}
             >
-              SRI MAHALAKSHMI <span>—</span> SWEETS
+              <span className="italic font-light text-amber-100/90">Sri</span> Mahalakshmi <span className="text-amber-200/80 text-4xl align-middle mx-2">✦</span> Sweets
             </h1>
           </div>
 
-          {/* Left Description */}
-          <div className="no-select absolute bottom-10 left-12 max-w-sm lg:max-w-md z-10 subtitle description hidden sm:block">
+          {/* Left Description - Minimalist */}
+          <div className="no-select absolute bottom-20 left-20 max-w-md z-10 subtitle description hidden sm:block">
+            <div className="h-[1px] w-12 bg-amber-200/60 mb-6" />
             <h2
-              className={`text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl ${poppins.className} font-serif mb-4`}
+              className={`text-amber-50 text-3xl lg:text-4xl ${cormorant.className} font-light italic mb-4 leading-tight`}
             >
-              Traditional Indian Sweets
+              Curators of <br/>Authentic Tradition
             </h2>
             <p
-              className={`text-white ${poppins.className} text-sm sm:text-base md:text-lg mb-6`}
+              className={`text-slate-300 ${poppins.className} text-sm font-light tracking-wide leading-relaxed mb-8 max-w-xs`}
             >
-              Experience the authentic taste of handcrafted sweets made with
-              premium ingredients and time-honored recipes.
+              Handcrafted with premium ingredients and time-honored recipes since 1995.
             </p>
             <button
-              className={`text-white ${poppins.className} text-sm tracking-wider border-b border-white pb-1 hover:opacity-70 transition-opacity`}
+              className={`hero-btn group relative px-8 py-3 overflow-hidden bg-transparent border border-amber-200/30 text-amber-50 ${poppins.className} text-xs tracking-[0.2em] transition-all duration-500 hover:border-amber-200 pointer-events-auto`}
             >
-              SHOP NOW
+              <span className="relative z-10 group-hover:text-slate-900 transition-colors duration-500">EXPLORE COLLECTION</span>
+              <div className="absolute inset-0 bg-amber-100 transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out" />
             </button>
           </div>
 
-          {/* Right Description */}
-          <div className="no-select absolute bottom-10 right-12 max-w-md z-10 subtitle description hidden sm:block">
+          {/* Right Description - Location/Context */}
+          <div className="no-select absolute bottom-20 right-20 max-w-xs z-10 subtitle description hidden sm:block text-right">
+             <div className="h-[1px] w-12 bg-amber-200/60 mb-6 ml-auto" />
             <h2
-              className={`text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl ${poppins.className} font-serif mb-4`}
+              className={`text-amber-50 text-2xl ${cormorant.className} font-light mb-2`}
             >
               ArundelPet Main Road
             </h2>
             <p
-              className={`text-sm sm:text-base md:text-lg ${poppins.className} text-lg mb-6 text-white`}
+              className={`text-slate-400 ${poppins.className} text-xs tracking-widest uppercase`}
             >
-              since 1995
+              Est. 1995
             </p>
           </div>
 
-          {/* Mobile Description - Centered at bottom */}
+          {/* Scroll Indicator */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 scroll-indicator animate-bounce hidden lg:block">
+            <div className="w-[1px] h-12 bg-gradient-to-b from-white/0 via-white/50 to-white/0" />
+          </div>
+
+          {/* Mobile Description */}
           <div className="no-select absolute bottom-24 left-0 right-0 px-6 z-10 subtitle description lg:hidden">
             <div className="text-center">
               <h2
-                className={`text-white text-3xl ${poppins.className} font-serif mb-3`}
+                className={`text-white text-3xl ${playfair.className} mb-3`}
               >
-                Traditional Indian Sweets
+                Traditional Luxury
               </h2>
-              <p className={`text-white ${poppins.className} text-base mb-4`}>
-                Handcrafted with premium ingredients since 1995
+              <p className={`text-slate-300 ${poppins.className} text-sm mb-6 font-light`}>
+                Handcrafted with premium ingredients
               </p>
               <button
-                className={`text-white ${poppins.className} text-sm tracking-wider border-b border-white pb-1 hover:opacity-70 transition-opacity`}
+                className={`px-8 py-3 bg-white/10 backdrop-blur-sm border border-white/20 text-white ${poppins.className} text-xs tracking-widest uppercase`}
               >
-                SHOP NOW
+                Shop Now
               </button>
             </div>
           </div>
