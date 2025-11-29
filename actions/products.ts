@@ -64,6 +64,8 @@ export async function getProducts(filters = {}) {
 }
 
 export async function getProductDetails(productId: string) {
+    console.log("calling product details");
+
     try {
         const headers = await cookieManager.buildApiHeaders();
 

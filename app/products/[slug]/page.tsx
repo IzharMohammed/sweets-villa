@@ -2,6 +2,7 @@ import { getProductDetails } from "@/actions/products";
 import ProductImageGallery from "@/components/products/product-image-gallery";
 import ProductActions from "@/components/products/product-actions";
 import { libre, montserrat, lato } from "@/lib/fonts";
+import BottomNav from "@/components/bottom-nav";
 
 export interface ProductResponse {
   success: boolean;
@@ -108,6 +109,7 @@ export default async function ProductDetailsPage({
           />
         </div>
       </div>
+      <BottomNav/>
     </div>
   );
 }

@@ -2,48 +2,35 @@
 
 import Image from "next/image";
 import { Minus, Plus, Trash2 } from "lucide-react";
-import { useState, useTransition } from "react";
-import { updateCartQuantity, removeFromCart } from "@/actions/cart";
-import { toast } from "sonner";
+import { useState } from "react";
+import { useUpdateCartQuantity } from "@/lib/hooks/use-update-cart-quantity";
+import { useRemoveFromCart } from "@/lib/hooks/use-remove-from-cart";
 import { cn } from "@/lib/utils";
-
-import { useRouter } from "next/navigation";
 
 interface CartItemProps {
   item: any; // Using any for now to match existing structure, should be typed properly
 }
 
 export default function CartItem({ item }: CartItemProps) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
   const [quantity, setQuantity] = useState(item.quantity);
+  const updateQuantityMutation = useUpdateCartQuantity();
+  const removeFromCartMutation = useRemoveFromCart();
 
   const handleUpdateQuantity = (newQuantity: number) => {
     if (newQuantity < 1) return;
-    setQuantity(newQuantity); // Optimistic update
+    setQuantity(newQuantity); // Optimistic local update
     
-    startTransition(async () => {
-      const result = await updateCartQuantity(item.id, newQuantity);
-      if (result.success) {
-        router.refresh();
-      } else {
-        toast.error(result.message);
-        setQuantity(item.quantity); // Revert on failure
-      }
+    updateQuantityMutation.mutate({
+      cartId: item.id,
+      newQuantity,
     });
   };
 
   const handleRemove = () => {
-    startTransition(async () => {
-      const result = await removeFromCart(item.id);
-      if (result.success) {
-        toast.success("Item removed");
-        router.refresh();
-      } else {
-        toast.error(result.message);
-      }
-    });
+    removeFromCartMutation.mutate(item.id);
   };
+
+  const isPending = updateQuantityMutation.isPending || removeFromCartMutation.isPending;
 
   return (
     <div className={cn(
@@ -137,3 +124,4 @@ export default function CartItem({ item }: CartItemProps) {
     </div>
   );
 }
+

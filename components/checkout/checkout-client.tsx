@@ -3,7 +3,7 @@ import { useState } from "react";
 import Script from "next/script";
 import { useRouter } from "next/navigation";
 import { createRazorpayOrder, verifyRazorpayPayment } from "@/actions/razorpay";
-import { createOrder } from "@/actions/order";
+import { useCreateOrder } from "@/lib/hooks/use-create-order";
 import { toast } from "sonner";
 import Image from "next/image";
 import { ShippingAddressDialog, AddressFormData } from "./shipping-address-dialog";
@@ -63,6 +63,7 @@ interface CartData {
 export default function CheckoutClient({ cartData }: { cartData: CartData }) {
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
+  const createOrderMutation = useCreateOrder();
 
 //   console.log(cartData);
 
@@ -122,18 +123,20 @@ export default function CheckoutClient({ cartData }: { cartData: CartData }) {
               shippingAddress: address,
             };
 
-            const result = await createOrder(orderData);
-
-            if (result.success) {
-              toast.success("Order placed successfully!");
-              router.push("/orders");
-            } else {
-              toast.error(result.message || "Failed to place order");
-            }
+            createOrderMutation.mutate(orderData, {
+              onSuccess: () => {
+                setIsProcessing(false);
+                // Navigation is handled in the hook
+              },
+              onError: (error: any) => {
+                toast.error(error?.message || "Failed to place order");
+                setIsProcessing(false);
+              },
+            });
           } else {
             toast.error("Payment verification failed");
+            setIsProcessing(false);
           }
-          setIsProcessing(false);
         },
         prefill: {
           name: "Customer Name", // TODO: Get from user profile
