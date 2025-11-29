@@ -68,7 +68,8 @@ export default function ProductActions({ productId, variants, description, categ
       }
     } catch (error) {
       console.error("Error adding to cart:", error);
-      toast.error("Something went wrong. Please try again.");
+      const errorMessage = error instanceof Error ? error.message : "Failed to add item to cart";
+      toast.error(errorMessage);
     } finally {
       setIsAdding(false);
     }
