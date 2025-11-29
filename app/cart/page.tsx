@@ -79,7 +79,7 @@ export default function Cart() {
           </div>
 
           {/* Order Summary - Right Side */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 mb-20 lg:mb-0">
             <div className="lg:sticky lg:top-24 animate-in fade-in slide-in-from-right-4 duration-700">
               <CartSummary 
                 summary={cart.summary} 
