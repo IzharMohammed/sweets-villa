@@ -6,6 +6,10 @@ import { revalidateTag } from "next/cache";
 const API_KEY = process.env.BACKEND_API_KEY || "";
 const BACKEND_URL = process.env.BACKEND_URL || "";
 
+export async function getAuthStatus() {
+    return await cookieManager.isAuthenticated();
+}
+
 export async function sendOtp(phoneNumber: string) {
     if (!API_KEY || !BACKEND_URL) {
         console.error(

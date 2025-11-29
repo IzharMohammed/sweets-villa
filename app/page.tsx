@@ -8,6 +8,7 @@ import { cookieManager } from "@/utils/authTools";
 export default async function Home() {
   const auth = await cookieManager.isAuthenticated();
   console.log("auth", auth);
+  
 
   return (
     <div>

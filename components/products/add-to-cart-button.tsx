@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { addToCart } from "@/actions/cart";
-import { toast } from "sonner";
+import { useAddToCart } from "@/lib/hooks/use-add-to-cart";
 
 interface AddToCartButtonProps {
   productId: string;
@@ -10,34 +8,23 @@ interface AddToCartButtonProps {
 }
 
 export default function AddToCartButton({ productId, variantId }: AddToCartButtonProps) {
-  const [isAdding, setIsAdding] = useState(false);
+  const addToCartMutation = useAddToCart();
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigation if inside a link
     e.stopPropagation(); // Stop event bubbling
 
-    if (isAdding) return;
-    setIsAdding(true);
-
-    try {
-      const result = await addToCart(productId, variantId, 1);
-      if (result.success) {
-        toast.success(result.message || "Item added to cart!");
-      } else {
-        toast.error(result.message || "Failed to add item to cart");
-      }
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setIsAdding(false);
-    }
+    addToCartMutation.mutate({
+      productId,
+      variantId,
+      quantity: 1,
+    });
   };
 
   return (
     <button
       onClick={handleAddToCart}
-      disabled={isAdding}
+      disabled={addToCartMutation.isPending}
       className="
         group w-full mt-2 relative overflow-hidden
         bg-yellow-600 text-white py-2 rounded-lg text-sm font-medium
@@ -47,7 +34,7 @@ export default function AddToCartButton({ productId, variantId }: AddToCartButto
       "
     >
       <span className="relative z-10">
-        {isAdding ? "Adding..." : "Add"}
+        {addToCartMutation.isPending ? "Adding..." : "Add"}
       </span>
     </button>
   );
