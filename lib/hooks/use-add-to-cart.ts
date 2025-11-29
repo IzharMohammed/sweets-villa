@@ -45,9 +45,9 @@ export function useAddToCart() {
             toast.error(errorMessage);
         },
 
-        onSuccess: (data) => {
+        onSuccess: async (data) => {
             // Invalidate cart to refetch fresh data
-            queryClient.invalidateQueries({ queryKey: queryKeys.cart.all });
+            await queryClient.invalidateQueries({ queryKey: queryKeys.cart.items() });
 
             // Show success toast
             toast.success(data?.message || "Item added to cart!");
