@@ -67,7 +67,7 @@ export default function Orders() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-6 mb-20">
+          <div className="space-y-6 mb-20 lg:mb-0">
             {orders.map((order) => (
               <div
                 key={order.id}

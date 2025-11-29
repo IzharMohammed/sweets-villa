@@ -57,7 +57,7 @@ export default function ProductAccordion({
   };
 
   return (
-    <div className="border-t border-gray-200 pt-6 mb-10 lg:mb-0">
+    <div className="border-t border-gray-200 pt-6 mb-20 lg:mb-0">
       <button
         onClick={toggleDetails}
         className="w-full cursor-pointer flex items-center justify-between text-left group"
