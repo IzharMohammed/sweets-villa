@@ -51,12 +51,18 @@ interface CartData {
   message: string;
 }
 
-export default function CartClient({ cart, isAuthenticated }: { cart: CartData, isAuthenticated: boolean }) {
+export default function CartClient({
+  cart,
+  isAuthenticated,
+}: {
+  cart: CartData;
+  isAuthenticated: boolean;
+}) {
   const router = useRouter();
   const [items, setItems] = useState(cart.data);
   const setCount = useCartStore((s) => s.setCount);
-  console.log("isAuthenticated",isAuthenticated);
-  
+  console.log("isAuthenticated", isAuthenticated);
+
   useEffect(() => {
     setCount(cart.count);
   }, [cart.count, setCount]);
@@ -109,13 +115,6 @@ export default function CartClient({ cart, isAuthenticated }: { cart: CartData, 
       </>
     );
   }
-
-  // Handle successful login
-  const handleLoginSuccess = () => {
-    // Redirect to checkout or show success message
-    console.log("Login successful, proceeding to checkout...");
-    router.push("/checkout");
-  };
 
   return (
     <>
@@ -257,10 +256,8 @@ export default function CartClient({ cart, isAuthenticated }: { cart: CartData, 
                   </div>
                 </div>
               </div>
-            
-              <OTPDrawer 
-              isAuthenticated={isAuthenticated}
-              onLoginSuccess={handleLoginSuccess} />
+
+              <OTPDrawer isAuthenticated={isAuthenticated} />
 
               <button
                 onClick={() => router.push("/products")}

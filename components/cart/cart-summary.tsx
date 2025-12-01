@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import OTPDrawer from "../otp-drawer";
 import { cn } from "@/lib/utils";
 
@@ -14,19 +14,14 @@ interface CartSummaryProps {
   className?: string;
 }
 
-export default function CartSummary({ summary, isAuthenticated, className }: CartSummaryProps) {
-  const router = useRouter();
-
-  const handleLoginSuccess = () => {
-    console.log("Login successful, proceeding to checkout...");
-    router.push("/checkout");
-  };
-
+export default function CartSummary({
+  summary,
+  isAuthenticated,
+  className,
+}: CartSummaryProps) {
   return (
     <div className={cn("bg-white rounded-2xl shadow-md p-6", className)}>
-      <h2 className="text-xl font-bold text-gray-800 mb-4">
-        Order Summary
-      </h2>
+      <h2 className="text-xl font-bold text-gray-800 mb-4">Order Summary</h2>
 
       <div className="space-y-3 mb-6">
         <div className="flex justify-between text-gray-600">
@@ -52,17 +47,14 @@ export default function CartSummary({ summary, isAuthenticated, className }: Car
         </div>
       </div>
 
-      <OTPDrawer
-        isAuthenticated={isAuthenticated}
-        onLoginSuccess={handleLoginSuccess}
-      />
+      <OTPDrawer isAuthenticated={isAuthenticated} />
 
-      <button
-        onClick={() => router.push("/products")}
-        className="w-full mt-3 border-2 border-gray-300 hover:border-gray-400 text-gray-700 py-3 rounded-xl font-medium transition-colors"
+      <Link
+        href="/products"
+        className="w-full mt-3 border-2 border-gray-300 hover:border-gray-400 text-gray-700 py-3 rounded-xl font-medium transition-colors inline-block text-center"
       >
         Continue Shopping
-      </button>
+      </Link>
     </div>
   );
 }
