@@ -106,7 +106,7 @@ export default function OTPDrawer({
       if (redirectUrl) {
         router.push(redirectUrl);
       } else {
-        router.push("/checkout");
+        router.replace("/checkout");
         // router.refresh();
       }
     } catch (error) {
