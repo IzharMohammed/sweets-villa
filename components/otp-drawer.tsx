@@ -21,9 +21,12 @@ import { sendOtp, verifyOtp } from "@/actions/auth";
 interface OTPDrawerProps {
   isAuthenticated: boolean;
   onLoginSuccess?: () => void;
+  redirectUrl?: string;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export default function OTPDrawer({ isAuthenticated, onLoginSuccess }: OTPDrawerProps) {
+export default function OTPDrawer({ isAuthenticated, onLoginSuccess, redirectUrl, isOpen: externalIsOpen, onOpenChange: externalOnOpenChange }: OTPDrawerProps) {
   const router = useRouter();
   const [parentOpen, setParentOpen] = useState(false);
   const [otpOpen, setOtpOpen] = useState(false);
@@ -34,7 +37,7 @@ export default function OTPDrawer({ isAuthenticated, onLoginSuccess }: OTPDrawer
   // Handle sending OTP
   const handleSendOTP = async () => {
     if (!phoneNumber || phoneNumber.length !== 10) {
-      alert("Please enter a valid 10-digit phone number");
+      toast("Please enter a valid 10-digit phone number");
       return;
     }
 
@@ -53,7 +56,7 @@ export default function OTPDrawer({ isAuthenticated, onLoginSuccess }: OTPDrawer
       setOtpOpen(true);
     } catch (error) {
       console.error("Error sending OTP:", error);
-      alert("Failed to send OTP. Please try again.");
+      toast("Failed to send OTP. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -62,7 +65,7 @@ export default function OTPDrawer({ isAuthenticated, onLoginSuccess }: OTPDrawer
   // Handle OTP verification and login
   const handleLogin = async () => {
     if (!otp || otp.length !== 6) {
-      alert("Please enter a valid 6-digit OTP");
+      toast("Please enter a valid 6-digit OTP");
       return;
     }
 
@@ -80,11 +83,18 @@ export default function OTPDrawer({ isAuthenticated, onLoginSuccess }: OTPDrawer
       setOtp("");
 
       // Call success callback
-      // if (onLoginSuccess) {
-      //   onLoginSuccess();
-      // }
-      toast.success("Login successful!"); 
-      router.push("/orders");
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      }
+      
+      toast.success("Login successful!");
+      
+      // Navigate to custom redirect URL or default to orders page
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      } else {
+        router.push("/cart");
+      }
     } catch (error) {
       console.error("Error verifying OTP:", error);
       toast.error("Invalid OTP. Please try again.");
@@ -100,7 +110,7 @@ export default function OTPDrawer({ isAuthenticated, onLoginSuccess }: OTPDrawer
   };
 
   return (
-    <Drawer open={parentOpen} onOpenChange={setParentOpen}>
+    <Drawer open={externalIsOpen !== undefined ? externalIsOpen : parentOpen} onOpenChange={externalOnOpenChange || setParentOpen}>
       <Button 
         onClick={() => {
           if (isAuthenticated) {

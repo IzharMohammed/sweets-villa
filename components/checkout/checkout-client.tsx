@@ -6,7 +6,10 @@ import { createRazorpayOrder, verifyRazorpayPayment } from "@/actions/razorpay";
 import { useCreateOrder } from "@/lib/hooks/use-create-order";
 import { toast } from "sonner";
 import Image from "next/image";
-import { ShippingAddressDialog, AddressFormData } from "./shipping-address-dialog";
+import {
+  ShippingAddressDialog,
+  AddressFormData,
+} from "./shipping-address-dialog";
 
 declare global {
   interface Window {
@@ -60,12 +63,20 @@ interface CartData {
   guestToken?: string;
 }
 
-export default function CheckoutClient({ cartData }: { cartData: CartData }) {
+interface CheckoutClientProps {
+  cartData: CartData;
+  mode?: "cart" | "direct";
+}
+
+export default function CheckoutClient({
+  cartData,
+  mode = "cart",
+}: CheckoutClientProps) {
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
   const createOrderMutation = useCreateOrder();
 
-//   console.log(cartData);
+  //   console.log(cartData);
 
   const handlePayment = async (address: AddressFormData) => {
     setIsProcessing(true);
@@ -97,8 +108,8 @@ export default function CheckoutClient({ cartData }: { cartData: CartData }) {
             response.razorpay_payment_id,
             response.razorpay_signature
           );
-          
-          console.log("verification from razorpay",verification);
+
+          console.log("verification from razorpay", verification);
 
           if (verification.success) {
             // 4. Create Order in Backend
@@ -121,6 +132,7 @@ export default function CheckoutClient({ cartData }: { cartData: CartData }) {
                 gatewaySignature: response.razorpay_signature,
               },
               shippingAddress: address,
+              fromCart: mode === "cart", // Set based on checkout mode
             };
 
             createOrderMutation.mutate(orderData, {
@@ -170,31 +182,42 @@ export default function CheckoutClient({ cartData }: { cartData: CartData }) {
       />
       <div className="max-w-4xl mx-auto p-6">
         <h1 className="text-3xl font-bold mb-8">Checkout</h1>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Order Items */}
           <div className="space-y-4">
-             <h2 className="text-xl font-semibold mb-4">Your Items</h2>
-             {cartData.data.map((item) => (
-                <div key={item.id} className="flex gap-4 bg-white p-4 rounded-xl shadow-sm">
-                  <div className="relative w-20 h-20 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
-                    <Image
-                      src={item.product.image[0] || "/placeholder.jpg"}
-                      alt={item.product.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-900">{item.product.name}</h3>
-                    <p className="text-sm text-gray-500">{item.variant.displayName}</p>
-                    <div className="flex justify-between items-center mt-2">
-                       <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
-                       <p className="font-semibold text-gray-900">₹{item.lineTotal}</p>
-                    </div>
+            <h2 className="text-xl font-semibold mb-4">Your Items</h2>
+            {cartData.data.map((item) => (
+              <div
+                key={item.id}
+                className="flex gap-4 bg-white p-4 rounded-xl shadow-sm"
+              >
+                <div className="relative w-20 h-20 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
+                  <Image
+                    src={item.product.image[0] || "/placeholder.jpg"}
+                    alt={item.product.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-medium text-gray-900">
+                    {item.product.name}
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    {item.variant.displayName}
+                  </p>
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-sm text-gray-600">
+                      Qty: {item.quantity}
+                    </p>
+                    <p className="font-semibold text-gray-900">
+                      ₹{item.lineTotal}
+                    </p>
                   </div>
                 </div>
-             ))}
+              </div>
+            ))}
           </div>
 
           {/* Order Summary */}
@@ -207,9 +230,11 @@ export default function CheckoutClient({ cartData }: { cartData: CartData }) {
               </div>
               <div className="flex justify-between text-gray-600">
                 <span>Discount</span>
-                <span className="text-green-600">-₹{cartData.summary.totalDiscount}</span>
+                <span className="text-green-600">
+                  -₹{cartData.summary.totalDiscount}
+                </span>
               </div>
-               <div className="flex justify-between text-gray-600">
+              <div className="flex justify-between text-gray-600">
                 <span>Delivery</span>
                 <span className="text-green-600">FREE</span>
               </div>
@@ -218,7 +243,7 @@ export default function CheckoutClient({ cartData }: { cartData: CartData }) {
                 <span>₹{cartData.summary.subtotal}</span>
               </div>
             </div>
-            
+
             <ShippingAddressDialog onConfirm={handlePayment}>
               <button
                 disabled={isProcessing}

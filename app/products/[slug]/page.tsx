@@ -1,4 +1,5 @@
 import { getProductDetails } from "@/actions/products";
+import { cookieManager } from "@/utils/authTools";
 import ProductImageGallery from "@/components/products/product-image-gallery";
 import ProductActions from "@/components/products/product-actions";
 import { libre, montserrat, lato } from "@/lib/fonts";
@@ -48,6 +49,9 @@ export default async function ProductDetailsPage({
   const { slug } = await params;
   const response = (await getProductDetails(slug)) as ProductResponse;
   const product = response.data;
+
+  // Check authentication status
+  const isAuthenticated = await cookieManager.isAuthenticated();
 
   // Default variant logic if needed, but ProductActions handles it
   const defaultVariant = product.variants.find((v) => v.isDefault) || product.variants[0];
@@ -106,6 +110,7 @@ export default async function ProductDetailsPage({
             variants={product.variants} 
             description={product.description}
             category={product.category}
+            isAuthenticated={isAuthenticated}
           />
         </div>
       </div>
