@@ -44,6 +44,8 @@ export default function Orders() {
       </div>
     );
   }
+  console.log("orders", orders);
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 py-8 lg:py-12 px-4 sm:px-6 lg:px-8">

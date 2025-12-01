@@ -18,11 +18,11 @@ export interface OrderItem {
 }
 
 export interface ShippingAddress {
-    city: string;
-    state: string;
     street: string;
-    country: string;
     zipCode: string;
+    city?: string;
+    state?: string;
+    country?: string;
 }
 
 export interface Order {
@@ -99,10 +99,10 @@ export async function createOrder(orderData: {
     };
     shippingAddress?: {
         street: string;
-        city: string;
-        state: string;
         zipCode: string;
-        country: string;
+        city?: string;
+        state?: string;
+        country?: string;
     };
     fromCart?: boolean;
 }) {
