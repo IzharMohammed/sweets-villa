@@ -85,30 +85,29 @@ export default function OTPDrawer({
 
       if (!response.success) {
         toast.error("Wrong otp number");
+        setIsLoading(false);
         return;
       }
-      // Close both drawers
-      setOtpOpen(false);
-      setParentOpen(false);
 
-      // Reset states
-      setPhoneNumber("");
-      setOtp("");
+      toast.success("Login successful!");
+
+      // Navigate BEFORE closing drawers to prevent component unmount
+      const targetUrl = redirectUrl || "/checkout";
+      router.push(targetUrl);
+      router.refresh();
 
       // Call success callback
       if (onLoginSuccess) {
         onLoginSuccess();
       }
 
-      toast.success("Login successful!");
+      // Close drawers after navigation
+      setOtpOpen(false);
+      setParentOpen(false);
 
-      // Navigate to custom redirect URL or default to orders page
-      if (redirectUrl) {
-        router.push(redirectUrl);
-      } else {
-        router.replace("/checkout");
-        // router.refresh();
-      }
+      // Reset states
+      setPhoneNumber("");
+      setOtp("");
     } catch (error) {
       console.error("Error verifying OTP:", error);
       toast.error("Invalid OTP. Please try again.");
