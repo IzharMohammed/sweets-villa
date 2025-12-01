@@ -17,7 +17,7 @@ export default function ProductCard({ product, index }: ProductCardProps) {
       className="group relative bg-white rounded-2xl p-3 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-4 fill-mode-both"
       style={{
         animationDelay: `${index * 100}ms`,
-        animationDuration: '700ms'
+        animationDuration: "700ms",
       }}
     >
       <Link href={`/products/${product.id}`} className="block">
@@ -57,10 +57,22 @@ export default function ProductCard({ product, index }: ProductCardProps) {
             )}
           </div>
         </div>
-      </Link>
 
-      {/* Add to Cart Button */}
-      <AddToCartButton productId={product.id} variantId={product.variants[0]?.id || ""} />
+        {/* Add to Cart Button */}
+        {/* <AddToCartButton productId={product.id} variantId={product.variants[0]?.id || ""} />
+         */}
+        <button
+          className="
+        group w-full mt-2 relative overflow-hidden
+        bg-yellow-600 text-white py-2 rounded-lg text-sm font-medium
+        shadow-md transition-all duration-300
+        disabled:opacity-50 disabled:cursor-not-allowed
+        hover:bg-yellow-700
+        "
+        >
+          <span className="relative z-10">Add</span>
+        </button>
+      </Link>
     </div>
   );
 }
