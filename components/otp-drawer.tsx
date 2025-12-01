@@ -26,7 +26,13 @@ interface OTPDrawerProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-export default function OTPDrawer({ isAuthenticated, onLoginSuccess, redirectUrl, isOpen: externalIsOpen, onOpenChange: externalOnOpenChange }: OTPDrawerProps) {
+export default function OTPDrawer({
+  isAuthenticated,
+  onLoginSuccess,
+  redirectUrl,
+  isOpen: externalIsOpen,
+  onOpenChange: externalOnOpenChange,
+}: OTPDrawerProps) {
   const router = useRouter();
   const [parentOpen, setParentOpen] = useState(false);
   const [otpOpen, setOtpOpen] = useState(false);
@@ -73,7 +79,14 @@ export default function OTPDrawer({ isAuthenticated, onLoginSuccess, redirectUrl
 
     try {
       // TODO: Call your API to verify OTP and login
-      await verifyOtp(phoneNumber, otp);
+      const response = await verifyOtp(phoneNumber, otp);
+
+      console.log("response from wrong otp", response);
+
+      if (!response.success) {
+        toast.error("Wrong otp number");
+        return;
+      }
       // Close both drawers
       setOtpOpen(false);
       setParentOpen(false);
@@ -86,14 +99,15 @@ export default function OTPDrawer({ isAuthenticated, onLoginSuccess, redirectUrl
       if (onLoginSuccess) {
         onLoginSuccess();
       }
-      
+
       toast.success("Login successful!");
-      
+
       // Navigate to custom redirect URL or default to orders page
       if (redirectUrl) {
         router.push(redirectUrl);
       } else {
-        router.push("/cart");
+        router.push("/checkout");
+        // router.refresh();
       }
     } catch (error) {
       console.error("Error verifying OTP:", error);
@@ -110,8 +124,11 @@ export default function OTPDrawer({ isAuthenticated, onLoginSuccess, redirectUrl
   };
 
   return (
-    <Drawer open={externalIsOpen !== undefined ? externalIsOpen : parentOpen} onOpenChange={externalOnOpenChange || setParentOpen}>
-      <Button 
+    <Drawer
+      open={externalIsOpen !== undefined ? externalIsOpen : parentOpen}
+      onOpenChange={externalOnOpenChange || setParentOpen}
+    >
+      <Button
         onClick={() => {
           if (isAuthenticated) {
             router.push("/checkout");
