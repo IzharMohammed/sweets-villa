@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { lato, montserrat } from "@/lib/fonts";
@@ -9,6 +10,7 @@ import { toast } from "sonner";
 import { useCartStore } from "@/store/cart-store";
 
 import ProductAccordion from "./product-accordion";
+import OTPDrawer from "@/components/otp-drawer";
 
 interface Variant {
   id: string;
@@ -26,14 +28,17 @@ interface ProductActionsProps {
   variants: Variant[];
   description: string;
   category: string;
+  isAuthenticated: boolean;
 }
 
-export default function ProductActions({ productId, variants, description, category }: ProductActionsProps) {
+export default function ProductActions({ productId, variants, description, category, isAuthenticated }: ProductActionsProps) {
+  const router = useRouter();
   const [selectedVariant, setSelectedVariant] = useState<Variant>(
     variants.find((v) => v.isDefault) || variants[0]
   );
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
+  const [showOtpDrawer, setShowOtpDrawer] = useState(false);
   const increment = useCartStore((s) => s.increment);
 
   // Handle variant selection
@@ -72,6 +77,18 @@ export default function ProductActions({ productId, variants, description, categ
       toast.error(errorMessage);
     } finally {
       setIsAdding(false);
+    }
+  };
+
+  // Handle Buy Now
+  const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      // Show OTP drawer for unauthenticated users
+      setShowOtpDrawer(true);
+    } else {
+      // Navigate to checkout with direct mode, including productId
+      const checkoutUrl = `/checkout?mode=direct&productId=${productId}&variantId=${selectedVariant.id}&quantity=${quantity}`;
+      router.push(checkoutUrl);
     }
   };
 
@@ -139,11 +156,22 @@ export default function ProductActions({ productId, variants, description, categ
       <button
         onClick={handleAddToCart}
         disabled={isAdding}
-        className={`w-full bg-gray-800 text-white py-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors mb-3 text-sm uppercase tracking-wide ${montserrat.className} ${
+        className={`w-full bg-gray-800 text-white py-4 rounded-lg font-semibold hover:bg-gray-900 transition-colors mb-3 text-sm uppercase tracking-wide ${montserrat.className} ${
           isAdding ? "opacity-75 cursor-not-allowed" : ""
         }`}
       >
         {isAdding ? "ADDING..." : `ADD TO CART — ₹${totalPrice}`}
+      </button>
+
+      {/* Buy Now Button */}
+      <button
+        onClick={handleBuyNow}
+        disabled={isAdding}
+        className={`w-full bg-amber-600 text-white py-4 rounded-lg font-semibold hover:bg-amber-700 transition-colors mb-3 text-sm uppercase tracking-wide ${montserrat.className} ${
+          isAdding ? "opacity-75 cursor-not-allowed" : ""
+        }`}
+      >
+        BUY NOW — ₹{totalPrice}
       </button>
 
       {/* Find Nearest Store */}
@@ -158,6 +186,14 @@ export default function ProductActions({ productId, variants, description, categ
         category={category}
         weight={`${selectedVariant.quantity} ${selectedVariant.unit}`}
         stock={selectedVariant.stock}
+      />
+
+      {/* OTP Drawer for unauthenticated users */}
+      <OTPDrawer
+        isAuthenticated={isAuthenticated}
+        redirectUrl={`/checkout?mode=direct&productId=${productId}&variantId=${selectedVariant.id}&quantity=${quantity}`}
+        isOpen={showOtpDrawer}
+        onOpenChange={setShowOtpDrawer}
       />
     </div>
   );

@@ -104,6 +104,7 @@ export async function createOrder(orderData: {
         zipCode: string;
         country: string;
     };
+    fromCart?: boolean;
 }) {
     // Check if environment variables are set
     if (!API_KEY || !BACKEND_URL) {

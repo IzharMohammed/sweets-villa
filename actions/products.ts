@@ -79,7 +79,6 @@ export async function getProductDetails(productId: string) {
             },
         });
 
-
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             return {
