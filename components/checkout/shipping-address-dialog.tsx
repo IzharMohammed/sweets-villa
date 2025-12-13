@@ -28,7 +28,10 @@ import { Label } from "@/components/ui/label";
 
 const addressSchema = z.object({
   street: z.string().min(1, "Street address is required"),
-  zipCode: z.string().min(1, "Zip code is required"),
+  phone: z
+    .string()
+    .min(10, "Phone number is required")
+    .max(10, "Phone number must be 10 digits"),
 });
 
 export type AddressFormData = z.infer<typeof addressSchema>;
@@ -74,14 +77,15 @@ export function ShippingAddressDialog({
         )}
       </div>
       <div className="grid gap-2">
-        <Label htmlFor="zipCode">Zip Code</Label>
+        <Label htmlFor="phone">Phone Number</Label>
         <Input
-          id="zipCode"
-          {...register("zipCode")}
-          placeholder="Enter zip code"
+          id="phone"
+          {...register("phone")}
+          placeholder="Enter phone number"
+          type="tel"
         />
-        {errors.zipCode && (
-          <p className="text-sm text-red-500">{errors.zipCode.message}</p>
+        {errors.phone && (
+          <p className="text-sm text-red-500">{errors.phone.message}</p>
         )}
       </div>
     </form>

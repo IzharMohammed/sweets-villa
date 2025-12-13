@@ -99,7 +99,6 @@ export async function createOrder(orderData: {
     };
     shippingAddress?: {
         street: string;
-        zipCode: string;
         city?: string;
         state?: string;
         country?: string;
@@ -145,6 +144,7 @@ export async function createOrder(orderData: {
         }
 
         const result = await response.json();
+        console.log("Response JSON from backend:", JSON.stringify(result, null, 2));
 
         // Revalidate both orders and cart tags since order creation affects both
         revalidateTag("orders", "max");
@@ -153,6 +153,7 @@ export async function createOrder(orderData: {
         return {
             success: true,
             message: "Order placed successfully!",
+            data: result, // Return the full result from the backend
         };
     } catch (error) {
         console.error("Error creating order:", error);
@@ -160,6 +161,50 @@ export async function createOrder(orderData: {
             success: false,
             message:
                 error instanceof Error ? error.message : "Failed to create order",
+        };
+    }
+}
+
+export async function updateOrder(orderId: string, updateData: any) {
+    // Check if environment variables are set
+    if (!API_KEY || !BACKEND_URL) {
+        console.error(
+            "Missing environment variables: BACKEND_API_KEY or BACKEND_URL"
+        );
+        return {
+            success: false,
+            message: "Server configuration error. Please try again later.",
+        };
+    }
+
+    try {
+        const headers = await cookieManager.buildApiHeaders();
+
+        const response = await fetch(`${BACKEND_URL}/v1/order/${orderId}`, {
+            method: "PATCH", // Assuming PATCH for updates
+            headers,
+            body: JSON.stringify(updateData),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to update order");
+        }
+
+        const result = await response.json();
+
+        revalidateTag("orders", "max");
+
+        return {
+            success: true,
+            message: "Order updated successfully",
+            data: result,
+        };
+    } catch (error) {
+        console.error("Error updating order:", error);
+        return {
+            success: false,
+            message: error instanceof Error ? error.message : "Failed to update order",
         };
     }
 }

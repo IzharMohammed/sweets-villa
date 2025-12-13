@@ -1,22 +1,14 @@
 "use client";
 import { useState } from "react";
-import Script from "next/script";
 import { useRouter } from "next/navigation";
-import { createRazorpayOrder, verifyRazorpayPayment } from "@/actions/razorpay";
+import { initiatePhonePePayment } from "@/actions/phonepe";
 import { createOrder } from "@/actions/order";
-import { useCreateOrder } from "@/lib/hooks/use-create-order";
 import { toast } from "sonner";
 import Image from "next/image";
 import {
   ShippingAddressDialog,
   AddressFormData,
 } from "./shipping-address-dialog";
-
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
 
 interface Product {
   id: string;
@@ -73,11 +65,7 @@ export default function CheckoutClient({
   cartData,
   mode = "cart",
 }: CheckoutClientProps) {
-  const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
-  const createOrderMutation = useCreateOrder();
-
-  //   console.log(cartData);
 
   const handlePayment = async (address: AddressFormData) => {
     setIsProcessing(true);
@@ -93,7 +81,7 @@ export default function CheckoutClient({
         })),
         total: cartData.summary.subtotal,
         payment: {
-          gateway: "RAZORPAY",
+          gateway: "PHONEPE",
           method: "OTHER",
           status: "PENDING", // Order created but payment not yet processed
           amount: cartData.summary.subtotal,
@@ -105,110 +93,63 @@ export default function CheckoutClient({
 
       console.log("📦 Creating backend order first...", orderData);
 
-      // Create order in backend BEFORE opening Razorpay
+      // Create order in backend BEFORE opening PhonePe
       const backendOrderResult = await createOrder(orderData);
 
-      if (!backendOrderResult.success) {
+      if (!backendOrderResult.success || !backendOrderResult.data) {
         toast.error(backendOrderResult.message || "Failed to create order");
         setIsProcessing(false);
         return;
       }
 
-      console.log("✅ Backend order created successfully");
+      console.log("✅ Backend order created successfully", backendOrderResult);
 
-      // Step 2: Create Razorpay payment order
-      const { success, order, error } = await createRazorpayOrder(
-        cartData.summary.subtotal
+      // Extract Order ID
+      // Backend response: { success: true, data: { orderId: "...", ... }, ... }
+      // backendOrderResult.data is the full backend response
+      console.log("Debug Extraction:");
+      console.log("backendOrderResult.data:", backendOrderResult.data);
+      console.log(
+        "backendOrderResult.data.data:",
+        backendOrderResult.data?.data
+      );
+      console.log(
+        "backendOrderResult.data.data.orderId:",
+        backendOrderResult.data?.data?.orderId
       );
 
-      if (!success || !order) {
-        toast.error(error || "Failed to initialize payment");
-        // TODO: Mark backend order as failed
+      const orderId =
+        backendOrderResult.data?.data?.orderId ||
+        backendOrderResult.data?.data?.id ||
+        backendOrderResult.data?.id;
+
+      if (!orderId) {
+        console.error(
+          "Could not extract order ID from result:",
+          JSON.stringify(backendOrderResult, null, 2)
+        );
+        toast.error("Failed to retrieve order ID");
         setIsProcessing(false);
         return;
       }
 
-      // Step 3: Initialize Razorpay payment
-      const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: order.amount,
-        currency: order.currency,
-        name: "Sweets Villa",
-        description: "Payment for your order",
-        order_id: order.id,
-        handler: async function (response: any) {
-          // Step 4: Verify payment
-          const verification = await verifyRazorpayPayment(
-            response.razorpay_order_id,
-            response.razorpay_payment_id,
-            response.razorpay_signature
-          );
+      // Step 2: Initiate PhonePe payment
+      const mobileNumber = address.phone || "9999999999"; // Fallback if not provided
+      const phonePeResult = await initiatePhonePePayment(
+        cartData.summary.subtotal,
+        orderId,
+        mobileNumber
+      );
 
-          console.log("Payment verification:", verification);
-
-          if (verification.success) {
-            // Step 5: Update backend order with payment confirmation
-            const updateData = {
-              items: cartData.data.map((item) => ({
-                productId: item.product.id,
-                variantId: item.variantId,
-                quantity: item.quantity,
-                price: item.variant.price,
-              })),
-              total: cartData.summary.subtotal,
-              payment: {
-                gateway: "RAZORPAY",
-                method: "OTHER",
-                status: "AUTHORIZED", // Payment verified and authorized
-                amount: order.amount,
-                currency: order.currency,
-                gatewayOrderId: response.razorpay_order_id,
-                gatewayPaymentId: response.razorpay_payment_id,
-                gatewaySignature: response.razorpay_signature,
-              },
-              shippingAddress: address,
-              fromCart: mode === "cart",
-            };
-
-            console.log("💳 Updating order with payment details...");
-
-            createOrderMutation.mutate(updateData, {
-              onSuccess: (data) => {
-                console.log("✅ Order updated with payment:", data);
-                setIsProcessing(false);
-                toast.success("Payment successful!");
-                // Navigation is handled in the hook
-              },
-              onError: (error: any) => {
-                console.error("❌ Failed to update order with payment:", error);
-                toast.error(
-                  "Payment received but order update failed. Please contact support."
-                );
-                setIsProcessing(false);
-              },
-            });
-          } else {
-            toast.error("Payment verification failed");
-            setIsProcessing(false);
-          }
-        },
-        prefill: {
-          name: "Customer Name", // TODO: Get from user profile
-          email: "customer@example.com", // TODO: Get from user profile
-          contact: "9999999999", // TODO: Get from user profile
-        },
-        theme: {
-          color: "#D97706", // amber-600
-        },
-      };
-
-      const rzp1 = new window.Razorpay(options);
-      rzp1.on("payment.failed", function (response: any) {
-        toast.error(response.error.description || "Payment failed");
-        // TODO: Mark backend order as failed
+      if (!phonePeResult.success || !phonePeResult.redirectUrl) {
+        toast.error(phonePeResult.error || "Failed to initiate payment");
         setIsProcessing(false);
-      });
-      rzp1.open();
+        return;
+      }
+
+      // Step 3: Redirect to PhonePe
+      console.log("Redirecting to PhonePe:", phonePeResult.redirectUrl);
+      window.location.href = phonePeResult.redirectUrl;
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Something went wrong");
@@ -218,11 +159,6 @@ export default function CheckoutClient({
 
   return (
     <>
-      <Script
-        id="razorpay-checkout-js"
-        src="https://checkout.razorpay.com/v1/checkout.js"
-        strategy="lazyOnload"
-      />
       <div className="max-w-4xl mx-auto p-6">
         <h1 className="text-3xl font-bold mb-8">Checkout</h1>
 
@@ -292,7 +228,7 @@ export default function CheckoutClient({
                 disabled={isProcessing}
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isProcessing ? "Processing..." : "Pay with Razorpay"}
+                {isProcessing ? "Processing..." : "Pay with PhonePe"}
               </button>
             </ShippingAddressDialog>
           </div>
