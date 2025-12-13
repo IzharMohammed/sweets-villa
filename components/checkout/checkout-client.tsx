@@ -3,6 +3,7 @@ import { useState } from "react";
 import Script from "next/script";
 import { useRouter } from "next/navigation";
 import { createRazorpayOrder, verifyRazorpayPayment } from "@/actions/razorpay";
+import { createOrder } from "@/actions/order";
 import { useCreateOrder } from "@/lib/hooks/use-create-order";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -82,18 +83,52 @@ export default function CheckoutClient({
     setIsProcessing(true);
 
     try {
-      // 1. Create Order
+      // Step 1: Create backend order with PENDING payment status
+      const orderData = {
+        items: cartData.data.map((item) => ({
+          productId: item.product.id,
+          variantId: item.variantId,
+          quantity: item.quantity,
+          price: item.variant.price,
+        })),
+        total: cartData.summary.subtotal,
+        payment: {
+          gateway: "RAZORPAY",
+          method: "OTHER",
+          status: "PENDING", // Order created but payment not yet processed
+          amount: cartData.summary.subtotal,
+          currency: "INR",
+        },
+        shippingAddress: address,
+        fromCart: mode === "cart",
+      };
+
+      console.log("📦 Creating backend order first...", orderData);
+
+      // Create order in backend BEFORE opening Razorpay
+      const backendOrderResult = await createOrder(orderData);
+
+      if (!backendOrderResult.success) {
+        toast.error(backendOrderResult.message || "Failed to create order");
+        setIsProcessing(false);
+        return;
+      }
+
+      console.log("✅ Backend order created successfully");
+
+      // Step 2: Create Razorpay payment order
       const { success, order, error } = await createRazorpayOrder(
         cartData.summary.subtotal
       );
 
       if (!success || !order) {
-        toast.error(error || "Failed to create payment order");
+        toast.error(error || "Failed to initialize payment");
+        // TODO: Mark backend order as failed
         setIsProcessing(false);
         return;
       }
 
-      // 2. Initialize Razorpay
+      // Step 3: Initialize Razorpay payment
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: order.amount,
@@ -102,18 +137,18 @@ export default function CheckoutClient({
         description: "Payment for your order",
         order_id: order.id,
         handler: async function (response: any) {
-          // 3. Verify Payment
+          // Step 4: Verify payment
           const verification = await verifyRazorpayPayment(
             response.razorpay_order_id,
             response.razorpay_payment_id,
             response.razorpay_signature
           );
 
-          console.log("verification from razorpay", verification);
+          console.log("Payment verification:", verification);
 
           if (verification.success) {
-            // 4. Create Order in Backend
-            const orderData = {
+            // Step 5: Update backend order with payment confirmation
+            const updateData = {
               items: cartData.data.map((item) => ({
                 productId: item.product.id,
                 variantId: item.variantId,
@@ -123,8 +158,8 @@ export default function CheckoutClient({
               total: cartData.summary.subtotal,
               payment: {
                 gateway: "RAZORPAY",
-                method: "OTHER", // TODO: Can be refined if we get method from Razorpay
-                status: "AUTHORIZED", // Since we verified signature
+                method: "OTHER",
+                status: "AUTHORIZED", // Payment verified and authorized
                 amount: order.amount,
                 currency: order.currency,
                 gatewayOrderId: response.razorpay_order_id,
@@ -132,16 +167,23 @@ export default function CheckoutClient({
                 gatewaySignature: response.razorpay_signature,
               },
               shippingAddress: address,
-              fromCart: mode === "cart", // Set based on checkout mode
+              fromCart: mode === "cart",
             };
 
-            createOrderMutation.mutate(orderData, {
-              onSuccess: () => {
+            console.log("💳 Updating order with payment details...");
+
+            createOrderMutation.mutate(updateData, {
+              onSuccess: (data) => {
+                console.log("✅ Order updated with payment:", data);
                 setIsProcessing(false);
+                toast.success("Payment successful!");
                 // Navigation is handled in the hook
               },
               onError: (error: any) => {
-                toast.error(error?.message || "Failed to place order");
+                console.error("❌ Failed to update order with payment:", error);
+                toast.error(
+                  "Payment received but order update failed. Please contact support."
+                );
                 setIsProcessing(false);
               },
             });
@@ -163,6 +205,7 @@ export default function CheckoutClient({
       const rzp1 = new window.Razorpay(options);
       rzp1.on("payment.failed", function (response: any) {
         toast.error(response.error.description || "Payment failed");
+        // TODO: Mark backend order as failed
         setIsProcessing(false);
       });
       rzp1.open();
