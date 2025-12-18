@@ -25,7 +25,7 @@ export default function ProductImageGallery({
   const currentX = useRef(0);
   const isDragging = useRef(false);
 
-  const slideCount = images.length;
+  const slideCount = images && images.length;
 
   // Initial mount animation
   useGSAP(() => {
@@ -135,7 +135,7 @@ export default function ProductImageGallery({
         ref={thumbnailsRef}
         className="hidden lg:flex absolute top-4 left-4 z-10 flex-col gap-2"
       >
-        {images.map((img, index) => (
+        {images && images.map((img, index) => (
           <button
             key={index}
             onClick={() => handleImageSelect(index)}
@@ -164,7 +164,7 @@ export default function ProductImageGallery({
           className="slides flex w-full h-full"
           style={{ touchAction: "none" }}
         >
-          {images.map((img, index) => (
+          {images && images.map((img, index) => (
             <div key={index} className="slide min-w-full h-full relative">
               <Image
                 src={img}
@@ -179,7 +179,7 @@ export default function ProductImageGallery({
 
         {/* Mobile Indicators */}
         <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 md:hidden z-20">
-          {images.map((_, idx) => (
+          {images && images.map((_, idx) => (
             <div
               key={idx}
               className={`indicator-dot indicator-dot-${idx} w-2 h-2 rounded-full bg-white/80`}

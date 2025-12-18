@@ -50,17 +50,35 @@ export default async function ProductDetailsPage({
   const response = (await getProductDetails(slug)) as ProductResponse;
   const product = response.data;
 
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Product Not Found
+          </h1>
+          <p className="text-gray-600">
+            The product you are looking for does not exist or has been removed.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   // Check authentication status
   const isAuthenticated = await cookieManager.isAuthenticated();
 
   // Default variant logic if needed, but ProductActions handles it
-  const defaultVariant = product.variants.find((v) => v.isDefault) || product.variants[0];
+  // const defaultVariant = product.variants.find((v) => v.isDefault) || product.variants[0];
 
   return (
     <div className="min-h-screen bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2">
         {/* LEFT SIDE - Full Height Image Gallery (Client Component) */}
-        <ProductImageGallery images={product.image} productName={product.name} />
+        <ProductImageGallery
+          images={product.image}
+          productName={product.name}
+        />
 
         {/* RIGHT SIDE - Product Details (Server Rendered Static Content + Client Actions) */}
         <div className="px-6 py-8 sm:px-12 sm:py-12 lg:px-16">
@@ -105,16 +123,16 @@ export default async function ProductDetailsPage({
           </div>
 
           {/* Interactive Actions (Variants, Quantity, Cart, Accordion) */}
-          <ProductActions 
-            productId={product.id} 
-            variants={product.variants} 
+          <ProductActions
+            productId={product.id}
+            variants={product.variants}
             description={product.description}
             category={product.category}
             isAuthenticated={isAuthenticated}
           />
         </div>
       </div>
-      <BottomNav/>
+      <BottomNav />
     </div>
   );
 }
