@@ -43,6 +43,8 @@ export async function GET(request: NextRequest) {
             cache: "no-store",
         });
 
+        console.log("backendResponse", backendResponse);
+
         const newToken = backendResponse.headers.get("x-guest-token");
 
         if (!newToken) {
