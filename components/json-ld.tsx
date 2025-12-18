@@ -3,7 +3,7 @@ export default function JsonLd() {
     "@context": "https://schema.org",
     "@type": "Store",
     name: "Sri Mahalakshmi Sweets",
-    image: "https://sweets-villa.vercel.app/og-image.png",
+    image: "https://sweets-villa.vercel.app/og-image.jpg",
     description:
       "Handcrafted with premium ingredients and time-honored recipes since 1995.",
     url: "https://sweets-villa.vercel.app",

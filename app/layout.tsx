@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     siteName: "Sri Mahalakshmi Sweets",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Sri Mahalakshmi Sweets - Authentic Tradition",
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     title: "Sri Mahalakshmi Sweets - Authentic Tradition",
     description:
       "Handcrafted with premium ingredients and time-honored recipes since 1995.",
-    images: ["/og-image.png"],
+    images: ["/og-image.jpg"],
     creator: "@srimahalakshmisweets", // Placeholder
   },
   robots: {
