@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
         rules: {
             userAgent: "*",
             allow: "/",
-            disallow: ["/api/", "/admin/"], // Disallow internal API and admin routes
+            disallow: ["/api/"], 
         },
         sitemap: "https://sweets-villa.vercel.app/sitemap.xml",
     };
