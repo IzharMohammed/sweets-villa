@@ -228,7 +228,7 @@ export default function CheckoutClient({
                 disabled={isProcessing}
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isProcessing ? "Processing..." : "Pay with PhonePe"}
+                {isProcessing ? "Processing..." : "Pay"}
               </button>
             </ShippingAddressDialog>
           </div>
