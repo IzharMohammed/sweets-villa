@@ -12,8 +12,12 @@ export default function Products() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 flex items-center justify-center">
         <div className="text-center px-4">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Failed to load products</h2>
-          <p className="text-gray-600">{(error as any)?.message || "Please try again later"}</p>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Failed to load products
+          </h2>
+          <p className="text-gray-600">
+            {(error as any)?.message || "Please try again later"}
+          </p>
         </div>
       </div>
     );
@@ -54,11 +58,7 @@ export default function Products() {
           {/* Vertical Products Grid */}
           <div className="products-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
             {products.map((product: any, index: number) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                index={index}
-              />
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>

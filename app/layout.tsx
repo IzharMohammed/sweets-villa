@@ -40,6 +40,10 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/og-image.jpg",
+  },
   metadataBase: new URL("https://sweets-villa.vercel.app"),
   openGraph: {
     title: "Sri Mahalakshmi Sweets - Authentic Tradition",

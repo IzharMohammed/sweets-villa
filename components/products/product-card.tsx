@@ -3,36 +3,25 @@ import Link from "next/link";
 import { Product } from "@/types/product";
 import AddToCartButton from "./add-to-cart-button";
 
-interface ProductCardProps {
-  product: Product;
-  index: number;
-}
-
-export default function ProductCard({ product, index }: ProductCardProps) {
+export default function ProductCard({ product }: { product: Product }) {
   const lowestPrice = Math.min(...product.variants.map((v) => v.price));
   const hasDiscount = product.variants.some((v) => v.discount > 0);
 
   return (
-    <div
-      className="group relative bg-white rounded-2xl p-3 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-4 fill-mode-both"
-      style={{
-        animationDelay: `${index * 100}ms`,
-        animationDuration: "700ms",
-      }}
-    >
+    <div className="group relative bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
       <Link href={`/products/${product.id}`} className="block">
         {/* Image Container */}
-        <div className="relative aspect-square bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl overflow-hidden mb-3">
+        <div className="relative aspect-square bg-gray-50 rounded-xl overflow-hidden mb-3">
           <Image
             src={product.image[0]}
             alt={product.name}
             fill
-            className="object-cover group-hover:scale-110 transition-transform duration-500"
+            className="object-cover"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
           {/* Discount Badge */}
           {hasDiscount && (
-            <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg z-10">
+            <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-sm z-10">
               SALE
             </div>
           )}
@@ -40,7 +29,7 @@ export default function ProductCard({ product, index }: ProductCardProps) {
 
         {/* Product Info */}
         <div className="space-y-1">
-          <h3 className="text-base font-semibold text-gray-800 group-hover:text-amber-600 transition-colors line-clamp-1">
+          <h3 className="text-base font-semibold text-gray-800 line-clamp-1">
             {product.name}
           </h3>
           <p className="text-xs text-gray-500 capitalize">{product.category}</p>
@@ -59,18 +48,14 @@ export default function ProductCard({ product, index }: ProductCardProps) {
         </div>
 
         {/* Add to Cart Button */}
-        {/* <AddToCartButton productId={product.id} variantId={product.variants[0]?.id || ""} />
-         */}
         <button
           className="
-        group w-full mt-2 relative overflow-hidden
+        w-full mt-2 relative overflow-hidden
         bg-yellow-600 text-white py-2 rounded-lg text-sm font-medium
-        shadow-md transition-all duration-300
-        disabled:opacity-50 disabled:cursor-not-allowed
-        hover:bg-yellow-700
+        shadow-sm hover:bg-yellow-700 transition-colors
         "
         >
-          <span className="relative z-10">Add</span>
+          Add
         </button>
       </Link>
     </div>
