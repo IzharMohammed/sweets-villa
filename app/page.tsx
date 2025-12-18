@@ -1,6 +1,4 @@
-import Image from "next/image";
 import HeroSection from "../components/  HeroSection";
-import Navbar from "../components/Navbar";
 import Products from "../components/products/products";
 import Footer from "../components/Footer";
 import { cookieManager } from "@/utils/authTools";
