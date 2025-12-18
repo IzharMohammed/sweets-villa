@@ -4,6 +4,7 @@ import ProductImageGallery from "@/components/products/product-image-gallery";
 import ProductActions from "@/components/products/product-actions";
 import { libre, montserrat, lato } from "@/lib/fonts";
 import BottomNav from "@/components/bottom-nav";
+import { Metadata } from "next";
 
 export interface ProductResponse {
   success: boolean;
@@ -135,4 +136,47 @@ export default async function ProductDetailsPage({
       <BottomNav />
     </div>
   );
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const response = (await getProductDetails(slug)) as ProductResponse;
+  const product = response.data;
+
+  if (!product) {
+    return {
+      title: "Product Not Found",
+    };
+  }
+
+  const title = `${product.name} | Sri Mahalakshmi Sweets`;
+  const description = product.description.slice(0, 160); // Optimize for SEO
+  const images = product.image.length > 0 ? [product.image[0]] : [];
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [
+        {
+          url: images[0],
+          width: 800,
+          height: 600,
+          alt: product.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images,
+    },
+  };
 }
